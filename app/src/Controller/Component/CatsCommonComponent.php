@@ -360,6 +360,7 @@ class CatsCommonComponent extends Component {
         ->matching('Tags', function ($q) use ($tag) {
             return $q->where(['Tags.tag =' => $tag]);
         })
+        ->group('Cats.id')
         ->order(['Cats.created' => 'DESC']);
         
         return $data;
