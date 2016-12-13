@@ -65,21 +65,24 @@
 </div>
 
 <div class="cats view large-9 medium-8 columns content">
+    <!-- 投稿者本人の場合のみ-->
     <?php if($auth && $cat->user && $auth['id'] == $cat->user->id): ?>
-    <div>
         <div class="row user_menu">
             <a class="btn btn-info btn-sm edit-cat" href="/cats/edit/<?=$cat->id ?>">編集</a>
             <?= $this->Form->postLink(__('削除'), ['action' => 'delete', $cat->id, ],
                 ['confirm' => __('本当に削除してもいいですか？', $cat->id), 'class' => 'btn btn-danger btn-sm delete-cat']) ?>
         </div>
         <hr>
-        <?php if(count($cat->eyewitnesses) > 0): ?>
-        <div class="row eyewitness">
-            <h6>目撃情報があります</h6>
-            <?php foreach ($cat->eyewitnesses as $eyewitness): ?>
+    <?php endif; ?>
+    <!-- 目撃情報の表示-->
+    <?php if(count($cat->eyewitnesses) > 0): ?>
+    <div class="row eyewitness">
+        <?php foreach ($cat->eyewitnesses as $eyewitness): ?>
+            <!-- 投稿者本人か情報提供者の場合のみ-->
+            <?php if($auth && $cat->user && ($auth['id'] == $cat->user->id || $auth['id'] == $eyewitness->user->id)): ?>
             <div class="w3-panel w3-leftbar w3-sand">
                 <div class="chat-info">
-                    <span class="chat-id"><a href="/profiles/user/<?= h($eyewitness->user->username) ?>" >@<?= h($eyewitness->user->username) ?></a></span> - <span class="chat-time"><?= h($eyewitness->created) ?></span></div>
+                    目撃情報：<span class="chat-id"><a href="/profiles/user/<?= h($eyewitness->user->username) ?>" >@<?= h($eyewitness->user->username) ?></a></span> - <span class="chat-time"><?= h($eyewitness->created) ?></span></div>
                 <div>
                     <?= $eyewitness->content ?>
                 </div>
@@ -93,19 +96,17 @@
                 <?php endforeach; ?>
                 </div>
             </div>
-            <?php endforeach; ?>
-            <script>
-                $(function(){
-                    $('.eyewitness .chat-info').css('margin-left','0');
-                    $('.eyewitness .chat-info .chat-time').each(function(){
-                        var t = new Date($(this).text()).toTwitterRelativeTime('ja');
-                        $(this).text(t);
-                    });
+            <?php endif; ?>
+        <?php endforeach; ?>
+        <script>
+            $(function(){
+                $('.eyewitness .chat-info').css('margin-left','0');
+                $('.eyewitness .chat-info .chat-time').each(function(){
+                    var t = new Date($(this).text()).toTwitterRelativeTime('ja');
+                    $(this).text(t);
                 });
-            </script>
-        </div>
-        <hr>
-        <?php endif; ?>
+            });
+        </script>
     </div>
     <?php endif; ?>
     <div style="position: fixed; z-index: 999; bottom: 20px; right: 20px;">

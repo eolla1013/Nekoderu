@@ -1,11 +1,11 @@
 <div style="margin:15px 0;text-align:center">
     目撃した「迷子ねこ」の情報を教えて下さい
 </div>
-<div id="for-saving-cats-privacy-panel" class="w3-panel w3-note">
-    <h4>目撃情報の表示について</h4>
-    <p>
-        ここで投稿した情報は迷子ねこの登録者本人様と本サービス管理者以外は閲覧できません。
-    </p>
+<div id="for-saving-cats-privacy-panel" class="w3-panel w3-note w3-padding">
+    <h6>目撃情報の表示について</h6>
+    <div class="w3-small">
+        ここで投稿した情報は迷子ねこの登録者本人様、情報提供者様、及び、本サービス管理者以外は閲覧できません。
+    </div>
 </div>
 
 <?= $this->element('partial/for_saving_cats_privacy'); ?>
