@@ -237,7 +237,7 @@ class ProfilesController extends AppController
     }
     
     public function notifications($limit=0){
-        if($limit <=0)
+        if($limit <= 0)
             $unreadOnly = false;
         else
             $unreadOnly = true;

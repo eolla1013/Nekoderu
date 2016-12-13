@@ -57,3 +57,16 @@
 img {
     margin-bottom: 0px;
 }
+
+/*
+user name
+*/
+.user {
+    width: 100%;
+    text-align: right;
+    font-size: 12px;
+}
+
+.user a{
+    color: gray;
+}

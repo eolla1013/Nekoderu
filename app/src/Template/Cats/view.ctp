@@ -60,17 +60,53 @@
         <p>
             これは迷子ねこ登録フォームからの投稿です。
         </p>
-        <p>迷子情報を提供していただくため、また、今現在のねこちゃんの位置ではなく危険は無いため、表示しています。</p>
+        <p>迷子情報を提供していただくため、また、今現在のねこちゃんの位置ではなく危険は無いため表示しています。</p>
     </div>
 </div>
 
 <div class="cats view large-9 medium-8 columns content">
     <?php if($auth && $cat->user && $auth['id'] == $cat->user->id): ?>
+    <div>
         <div class="row user_menu">
             <a class="btn btn-info btn-sm edit-cat" href="/cats/edit/<?=$cat->id ?>">編集</a>
             <?= $this->Form->postLink(__('削除'), ['action' => 'delete', $cat->id, ],
                 ['confirm' => __('本当に削除してもいいですか？', $cat->id), 'class' => 'btn btn-danger btn-sm delete-cat']) ?>
         </div>
+        <hr>
+        <?php if(count($cat->eyewitnesses) > 0): ?>
+        <div class="row eyewitness">
+            <h6>目撃情報があります</h6>
+            <?php foreach ($cat->eyewitnesses as $eyewitness): ?>
+            <div class="w3-panel w3-leftbar w3-sand">
+                <div class="chat-info">
+                    <span class="chat-id"><a href="/profiles/user/<?= h($eyewitness->user->username) ?>" >@<?= h($eyewitness->user->username) ?></a></span> - <span class="chat-time"><?= h($eyewitness->created) ?></span></div>
+                <div>
+                    <?= $eyewitness->content ?>
+                </div>
+                <div>
+                <?php foreach ($eyewitness->eyewitness_images as $image): ?>
+                    <?php if($image->thumbnail):?>
+                        <a class='gallery' href="<?= $image->url ?>"><img src="<?= $image->thumbnail ?>"></img></a>
+                    <?php else: ?>
+                        <a class='gallery' href="<?= $image->url ?>"><img src="<?= $image->url ?>"></img></a>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endforeach; ?>
+            <script>
+                $(function(){
+                    $('.eyewitness .chat-info').css('margin-left','0');
+                    $('.eyewitness .chat-info .chat-time').each(function(){
+                        var t = new Date($(this).text()).toTwitterRelativeTime('ja');
+                        $(this).text(t);
+                    });
+                });
+            </script>
+        </div>
+        <hr>
+        <?php endif; ?>
+    </div>
     <?php endif; ?>
     <div style="position: fixed; z-index: 999; bottom: 20px; right: 20px;">
         <a role="button" class=" encourage-popup btn btn-default btn-sm report-form" target=<?= $cat->id ?>>
@@ -104,7 +140,7 @@
     </div>
     
     <?php if($cat->flg === 1): ?>
-    <div class="w3-panel w3-info">
+    <div class="w3-panel w3-info w3-padding">
         <small>
         <div><strong>飼っていた場所</strong> <i class="glyphicon glyphicon-question-sign address-info"></i></div>
         <?php if(!empty($cat->address) && trim($cat->address) !== false): ?>
@@ -249,6 +285,14 @@ input[type="text"] {
 
 .btn-default {
     background-image: none;
+}
+
+.eyewitness img {
+    width: 25%;
+}
+
+.eyewitness .w3-panel {
+    padding-bottom: 10px;
 }
 
 </style>

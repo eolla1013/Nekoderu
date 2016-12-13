@@ -3,10 +3,9 @@
 namespace App\Controller\Admin;
 
 use Cake\Controller\Controller;
-use App\Controller\AppController;
 use Cake\Event\Event;
 
-class CatsController extends AdminAppController
+class CatsController extends AppController
 {
     public $components = array('NekoUtil');
     

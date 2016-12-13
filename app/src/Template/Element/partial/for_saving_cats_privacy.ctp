@@ -12,7 +12,7 @@
     <p>
         ご協力よろしくお願いいたします。
     </p>
-    <div class="btn btn btn-default" style="margin-bottom:10px"><a id="for-saving-cats-privacy" href="#">確認しました<a></a></div>
+    <div class="btn btn-default" style="margin-bottom:10px"><a id="for-saving-cats-privacy" href="#">確認しました</a></div>
 </div>
 
 <script>

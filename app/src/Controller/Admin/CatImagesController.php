@@ -1,7 +1,6 @@
 <?php
 namespace App\Controller\Admin;
 
-use App\Controller\AppController;
 use Cake\Event\Event;
 
 /**
@@ -9,7 +8,7 @@ use Cake\Event\Event;
  *
  * @property \App\Model\Table\CatImagesTable $CatImages
  */
-class CatImagesController extends AdminAppController
+class CatImagesController extends AppController
 {
     
     public $components = ['NekoUtil'];

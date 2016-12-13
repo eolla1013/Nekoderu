@@ -149,11 +149,19 @@ class CatsController extends AppController
     {
         
         $cat = $this->Cats->get($id, [
-            'contain' => ['CatImages', 
-            'Comments'=> function ($q) {
-                return $q->order(['Comments.created' => 'DESC']);
-            },  
-            'Users', 'ResponseStatuses', 'Tags']
+            'contain' => [
+                'CatImages', 
+                'Comments'=> function ($q) {
+                    return $q->order(['Comments.created' => 'DESC']);
+                },  
+                'Users', 'ResponseStatuses', 'Tags', 
+                'Eyewitnesses' => function ($q) {
+                    return $q
+                        ->order(['Eyewitnesses.created' => 'DESC']);
+                },
+                'Eyewitnesses.Users',
+                'Eyewitnesses.EyewitnessImages'
+            ]
         ]);
         
         
@@ -310,7 +318,6 @@ class CatsController extends AppController
             
             $this->log($this->request->data);
 
-            $time = time();
             $locate = (string)$data['locate'];
             $address = (string)$data['address'];
             $ear_shape = $data['ear_shape'];

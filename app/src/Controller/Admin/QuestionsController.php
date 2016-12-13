@@ -1,14 +1,12 @@
 <?php
 namespace App\Controller\Admin;
 
-use App\Controller\AppController;
-
 /**
  * Questions Controller
  *
  * @property \App\Model\Table\QuestionsTable $Questions
  */
-class QuestionsController extends AdminAppController
+class QuestionsController extends AppController
 {
 
     /**

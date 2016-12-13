@@ -1,14 +1,12 @@
 <?php
 namespace App\Controller\Admin;
 
-use App\Controller\AppController;
-
 /**
  * Avatars Controller
  *
  * @property \App\Model\Table\AvatarsTable $Avatars
  */
-class AvatarsController extends AdminAppController
+class AvatarsController extends AppController
 {
 
     /**

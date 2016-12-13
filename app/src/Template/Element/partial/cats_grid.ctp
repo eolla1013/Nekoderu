@@ -56,16 +56,6 @@
       transform: translate(-20%, -50%);
     }
     
-    .user {
-        width: 100%;
-        text-align: right;
-        font-size: 12px;
-    }
-    
-    .user a{
-        color: gray;
-    }
-    
     .favorited {
         color: #ffa500 !important;
     }
@@ -221,15 +211,18 @@ $(function(){
                     <?php endif; ?>
 
                     <?php if($cat->flg === 1): ?>
-                    <div class="w3-panel w3-info" style="margin-top:0px!important; margin-bottom:0px!important;">
-                        <small>
+                    <div class="w3-panel w3-info w3-padding" style="margin-top:0px!important; margin-bottom:0px!important;">
+                        <div class="w3-tiny">
                         <div><strong>飼っていた場所</strong> <i class="glyphicon glyphicon-question-sign address-info"></i></div>
                         <?php if(!empty($cat->address) && trim($cat->address) !== false): ?>
                             <div><?= $cat->address ?></div>
                         <?php else: ?>
                             <div>未登録</div>
                         <?php endif; ?>
-                        </small>
+                        </div>
+                        <a class="encourage-popup btn btn-sm btn-default w3-tiny" 
+                            style="margin-top:5px; color:black" 
+                            href="/eyewitnesses/add/<?=$cat->id ?>">情報を提供する</a>
                     </div>
                     <?php endif; ?>
                     

@@ -41,6 +41,9 @@ class CatsTable extends Table
         $this->hasMany('Answers', [
             'foreignKey' => 'cats_id',
         ]);
+        $this->hasMany('Eyewitnesses', [
+            'foreignKey' => 'cat_id',
+        ]);
         $this->belongsTo('ResponseStatuses', [
             'foreignKey' => 'response_statuses_id',
         ]);

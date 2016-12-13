@@ -1,14 +1,12 @@
 <?php
 namespace App\Controller\Admin;
 
-use App\Controller\AppController;
-
 /**
  * Tags Controller
  *
  * @property \App\Model\Table\TagsTable $Tags
  */
-class TestsController extends AdminAppController
+class TestsController extends AppController
 {
     public $components = array('NekoUtil', 'GoogleApi');
     

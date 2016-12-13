@@ -1,14 +1,12 @@
 <?php
 namespace App\Controller\Admin;
 
-use App\Controller\AppController;
-
 /**
  * Notifications Controller
  *
  * @property \App\Model\Table\NotificationsTable $Notifications
  */
-class NotificationsController extends AdminAppController
+class NotificationsController extends AppController
 {
 
     /**

@@ -1,14 +1,12 @@
 <?php
 namespace App\Controller\Admin;
 
-use App\Controller\AppController;
-
 /**
  * ResponseStatuses Controller
  *
  * @property \App\Model\Table\ResponseStatusesTable $ResponseStatuses
  */
-class ResponseStatusesController extends AdminAppController
+class ResponseStatusesController extends AppController
 {
 
     /**
