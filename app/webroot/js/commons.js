@@ -61,6 +61,24 @@ var isJSON = function(arg) {
     }
 };
 
+var linkify = function(parent, selector){
+
+    function _linkify(str){
+        
+        return str.replace(/((http|https|ftp):\/\/[\w?=&.\/-;#~%-]+(?![\w\s?&.\/;#~%"=-]*>))/g, '<a href="$1">$1</a> ');
+        
+    }
+    
+    parent.find(selector).each(function(){
+        var t = $(this);
+        if(!t.hasClass('linkified')){
+            t.addClass('linkified');
+            t.html(_linkify(t.html()));
+        }
+    });
+
+}
+
 var taggify = function(parent, selector){
 
     function _taggify(str){

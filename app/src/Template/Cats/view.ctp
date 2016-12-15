@@ -363,6 +363,7 @@ var updateComments = function(data){
         cln.find('.chat-time').text(new Date(this.created).toTwitterRelativeTime('ja') );
         
 		taggify(cln, '.chat-fukidashi');
+		linkify(cln, '.chat-fukidashi');
         
         var key = this.users_id;
         console.log(imageURLCache);
@@ -499,6 +500,7 @@ $('#addComment').submit(function(event) {
     
 $(function(){
    taggify($('.tags'), 'li'); 
+   linkify($('.tags'), 'li'); 
 });
 </script>
 

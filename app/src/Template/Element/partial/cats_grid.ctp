@@ -28,6 +28,7 @@
         font-size:12px;
         padding: 2px;
         padding-left: 10px;
+        word-break: break-all;
     }
     
     .btn-default {
@@ -330,6 +331,7 @@ $(function(){
         <?php endif; ?>
         
 		taggify($('body'), '.grid-comment');
+		linkify($('body'), '.grid-comment');
     }
     
     function lightboxing(){
