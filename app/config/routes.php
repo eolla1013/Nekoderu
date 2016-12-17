@@ -73,6 +73,7 @@ Router::scope('/', function (RouteBuilder $routes) {
      * CakeDC拡張の対応
      */
     $routes->redirect('/profiles/login', '/login');
+    $routes->redirect('/profile', '/profiles/edit');
     
     
     /**
