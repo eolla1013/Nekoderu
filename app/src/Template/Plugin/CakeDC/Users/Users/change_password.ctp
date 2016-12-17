@@ -17,8 +17,15 @@ $this->extend('/Layout/nekoderu');
                     'label' => __d('CakeDC/Users', '変更前（現在）のパスワード')]);
             ?>
         <?php endif; ?>
-        <?= $this->Form->input(__d('CakeDC/Users', '新しいパスワード')); ?>
-        <?= $this->Form->input(__d('CakeDC/Users', '新しいパスワード（確認）'), ['type' => 'password', 'required' => true]); ?>
+        
+        <?= $this->Form->input('password', [
+            'type' => 'password', 
+            'required' => true,
+            'label' => __d('CakeDC/Users', '新しいパスワード')]); ?>
+        <?= $this->Form->input('password_confirm', [
+            'type' => 'password', 
+            'required' => true,
+            'label' => __d('CakeDC/Users', '新しいパスワード（確認）')]); ?>
 
     </fieldset>
     <?= $this->Form->button(__d('CakeDC/Users', '実行')); ?>
