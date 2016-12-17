@@ -3,7 +3,7 @@ build:
   steps:
 deploy:
   steps:
-    - hotakasaito/elastic-beanstalk-deploy@1.2.3:
+    - shinobushiva/elastic-beanstalk-deploy:
         key: $ACCESS_KEY
         secret: $ACCESS_SECRET
         app_name: $APP_NAME
