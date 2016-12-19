@@ -67,3 +67,9 @@
         <p><?= $this->Paginator->counter() ?></p>
     </div>
 </div>
+
+<style> 
+body { 
+    overflow-x: auto; 
+} 
+</style>
