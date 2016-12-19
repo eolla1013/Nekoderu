@@ -188,139 +188,139 @@ class GoogleApiComponent extends Component {
         // AIzaSyBoBnKV2kj2wPfsDuBnBtjj1RGT9po11ng
     }
 
-    function s3Upload($file, $s3Dir) {
-        $ext = $this->extension($file);
-        $srcPath = $file;
+    // function s3Upload($file, $s3Dir) {
+    //     $ext = $this->extension($file);
+    //     $srcPath = $file;
 
-        $timestamp = uniqid();
-        $name = $timestamp . "_file." . $ext;
+    //     $timestamp = uniqid();
+    //     $name = $timestamp . "_file." . $ext;
         
-        $s3 = new S3Client([
-            'version'     => getenv('AWS_BUCKET_VERSION'),
-            'region'      => getenv('AWS_BUCKET_REGION'),
-            'credentials' => [
-                'key'    => getenv('AWS_BUCKET_KEY'),
-                'secret' => getenv('AWS_BUCKET_SECRET')
-            ]
-        ]);
+    //     $s3 = new S3Client([
+    //         'version'     => getenv('AWS_BUCKET_VERSION'),
+    //         'region'      => getenv('AWS_BUCKET_REGION'),
+    //         'credentials' => [
+    //             'key'    => getenv('AWS_BUCKET_KEY'),
+    //             'secret' => getenv('AWS_BUCKET_SECRET')
+    //         ]
+    //     ]);
 
-        try {
-            // Upload a file.
-            $result = $s3->putObject(array(
-                'Bucket'       => getenv('AWS_BUCKET_NAME'),
-                'Key'        => $name,
-                'SourceFile' => $srcPath,
-                'ACL'          => 'public-read',
-            ));
+    //     try {
+    //         // Upload a file.
+    //         $result = $s3->putObject(array(
+    //             'Bucket'       => getenv('AWS_BUCKET_NAME'),
+    //             'Key'        => $name,
+    //             'SourceFile' => $srcPath,
+    //             'ACL'          => 'public-read',
+    //         ));
 
-            return $result;
-        }catch (\RuntimeException $e){
-            throw $e;
-        }
+    //         return $result;
+    //     }catch (\RuntimeException $e){
+    //         throw $e;
+    //     }
 
-    }
+    // }
     
-    /**
-     * Expands the home directory alias '~' to the full path.
-     * @param string $path the path to expand.
-     * @return string the expanded path.
-     */
-    function expandHomeDirectory($path) {
-      $homeDirectory = getenv('HOME');
-      if (empty($homeDirectory)) {
-        $homeDirectory = getenv("HOMEDRIVE") . getenv("HOMEPATH");
-      }
-      return str_replace('~', realpath($homeDirectory), $path);
-    }
+    // /**
+    //  * Expands the home directory alias '~' to the full path.
+    //  * @param string $path the path to expand.
+    //  * @return string the expanded path.
+    //  */
+    // function expandHomeDirectory($path) {
+    //   $homeDirectory = getenv('HOME');
+    //   if (empty($homeDirectory)) {
+    //     $homeDirectory = getenv("HOMEDRIVE") . getenv("HOMEPATH");
+    //   }
+    //   return str_replace('~', realpath($homeDirectory), $path);
+    // }
    
-    /**
-     * 一度画像を別の形式に変換し、jpg形式に変換する
-     * TODO: @utsumi-k PHP Parserを使うかは場合は別途用意する
-     * @param $orgFilePath
-     * @param $exportFilePath
-     *
-     * @return string
-     */
-    function safeImage($orgFilePath, $exportFilePath) {
-        // 書き出しファイル名を生成
-        $outputFilePath = $exportFilePath . "/" . $this->generateUniqueFileName();
+    // /**
+    //  * 一度画像を別の形式に変換し、jpg形式に変換する
+    //  * TODO: @utsumi-k PHP Parserを使うかは場合は別途用意する
+    //  * @param $orgFilePath
+    //  * @param $exportFilePath
+    //  *
+    //  * @return string
+    //  */
+    // function safeImage($orgFilePath, $exportFilePath) {
+    //     // 書き出しファイル名を生成
+    //     $outputFilePath = $exportFilePath . "/" . $this->generateUniqueFileName();
 
-        // 元画像情報を取得
-        $size = getimagesize($orgFilePath);
-        if ($size === false) {
-            // 画像として認識できなかった
-            return "";
-        }
-        list($w, $h, $type) = $size;
-        list($width, $height) = $this->getSaveFileSize($w, $h);
+    //     // 元画像情報を取得
+    //     $size = getimagesize($orgFilePath);
+    //     if ($size === false) {
+    //         // 画像として認識できなかった
+    //         return "";
+    //     }
+    //     list($w, $h, $type) = $size;
+    //     list($width, $height) = $this->getSaveFileSize($w, $h);
 
-        // 1回最初にリサイズする
-        $res = new \Imagick($orgFilePath);
-        if (!$res->thumbnailImage($width, $height, true, true)) {
-            // リサイズ失敗
-            return "";
-        }
+    //     // 1回最初にリサイズする
+    //     $res = new \Imagick($orgFilePath);
+    //     if (!$res->thumbnailImage($width, $height, true, true)) {
+    //         // リサイズ失敗
+    //         return "";
+    //     }
 
-        if ($type == IMG_JPEG) {
-            // 一度pngにする
-            if (!$res->setImageFormat('png')) {
-                // 1回PNGに出来なかった
-                return "";
-            }
-        }
-        // 問題なかったのでjpgにしましょう。
-        if (!$res->setImageFormat("jpg")) {
-            // JPGへの変換失敗
-            return "";
-        }
-        if (!$res->writeImage($outputFilePath)) {
-            // 書き込み失敗
-            return "";
-        }
+    //     if ($type == IMG_JPEG) {
+    //         // 一度pngにする
+    //         if (!$res->setImageFormat('png')) {
+    //             // 1回PNGに出来なかった
+    //             return "";
+    //         }
+    //     }
+    //     // 問題なかったのでjpgにしましょう。
+    //     if (!$res->setImageFormat("jpg")) {
+    //         // JPGへの変換失敗
+    //         return "";
+    //     }
+    //     if (!$res->writeImage($outputFilePath)) {
+    //         // 書き込み失敗
+    //         return "";
+    //     }
 
-        return $outputFilePath;
-    }
+    //     return $outputFilePath;
+    // }
 
-    /**
-     * Uniqueなファイル名を生成する
-     * TODO: 絶対かぶらない保証もないし、非同期で保存されるけど、今んとこそこは危惧するレベルではないと判断
-     * @return string
-     */
-    function generateUniqueFileName() {
-        return md5(uniqid(rand(),1)) . ".jpg";
-    }
+    // /**
+    //  * Uniqueなファイル名を生成する
+    //  * TODO: 絶対かぶらない保証もないし、非同期で保存されるけど、今んとこそこは危惧するレベルではないと判断
+    //  * @return string
+    //  */
+    // function generateUniqueFileName() {
+    //     return md5(uniqid(rand(),1)) . ".jpg";
+    // }
 
 
-    /**
-     * 保存するサイズを計算する
-     * 960*540 までのサイズにする
-     * @param $orgWidth
-     * @param $orgHeight
-     *
-     * @return array
-     */
-    function getSaveFileSize($orgWidth, $orgHeight) {
-        $maxWidth = 960;
-        $maxHeight = 540;
-        $w = $orgWidth;
-        $h = $orgHeight;
+    // /**
+    //  * 保存するサイズを計算する
+    //  * 960*540 までのサイズにする
+    //  * @param $orgWidth
+    //  * @param $orgHeight
+    //  *
+    //  * @return array
+    //  */
+    // function getSaveFileSize($orgWidth, $orgHeight) {
+    //     $maxWidth = 960;
+    //     $maxHeight = 540;
+    //     $w = $orgWidth;
+    //     $h = $orgHeight;
 
-        if ($orgWidth > $maxWidth || $orgHeight > $maxHeight) {
-            // リサイズ必要
-            if ($orgWidth > $orgHeight) {
-                // 横長
-                $rate = $maxWidth / $orgWidth;
+    //     if ($orgWidth > $maxWidth || $orgHeight > $maxHeight) {
+    //         // リサイズ必要
+    //         if ($orgWidth > $orgHeight) {
+    //             // 横長
+    //             $rate = $maxWidth / $orgWidth;
 
-            } elseif ($orgHeight > $orgWidth) {
-                // 縦長
-                $rate = $maxHeight / $orgHeight;
-            } else {
-                // 正方形
-                $rate = $maxHeight / $orgHeight;
-            }
-            $w = (int)($orgWidth * $rate);
-            $h = (int)($orgHeight * $rate);
-        }
-        return [$w,$h];
-    }
+    //         } elseif ($orgHeight > $orgWidth) {
+    //             // 縦長
+    //             $rate = $maxHeight / $orgHeight;
+    //         } else {
+    //             // 正方形
+    //             $rate = $maxHeight / $orgHeight;
+    //         }
+    //         $w = (int)($orgWidth * $rate);
+    //         $h = (int)($orgHeight * $rate);
+    //     }
+    //     return [$w,$h];
+    // }
 }
