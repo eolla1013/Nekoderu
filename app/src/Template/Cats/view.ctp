@@ -78,8 +78,8 @@
     <?php if(count($cat->eyewitnesses) > 0): ?>
     <div class="row eyewitness">
         <?php foreach ($cat->eyewitnesses as $eyewitness): ?>
-            <!-- 投稿者本人か情報提供者の場合のみ-->
-            <?php if($auth && $cat->user && ($auth['id'] == $cat->user->id || $auth['id'] == $eyewitness->user->id)): ?>
+            <!-- 管理者、投稿者本人か情報提供者の場合のみ-->
+            <?php if($auth && $cat->user && ($auth['is_superuser'] || $auth['id'] == $cat->user->id || $auth['id'] == $eyewitness->user->id)): ?>
             <div class="w3-panel w3-leftbar w3-sand">
                 <div class="chat-info">
                     目撃情報：<span class="chat-id"><a href="/profiles/user/<?= h($eyewitness->user->username) ?>" >@<?= h($eyewitness->user->username) ?></a></span> - <span class="chat-time"><?= h($eyewitness->created) ?></span></div>
