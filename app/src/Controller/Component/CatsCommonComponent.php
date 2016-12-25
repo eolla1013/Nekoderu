@@ -269,7 +269,7 @@ class CatsCommonComponent extends Component {
                             ->contain(['Questions']);
                 }])
                 ->where([
-                    'hidden =' => 0
+                    'Cats.hidden =' => 0
                 ])
                 ->group('Cats.id')
                 ->order(['count' => 'DESC'])
@@ -298,7 +298,7 @@ class CatsCommonComponent extends Component {
                         ->contain(['Questions']);
                 }])
                 ->where([
-                    'hidden =' => 0
+                    'Cats.hidden =' => 0
                 ])
                 ->group('Cats.id')
                 ->order(['last' => 'DESC'])
@@ -320,7 +320,7 @@ class CatsCommonComponent extends Component {
                         ->contain(['Questions']);
                 }])
                 ->where([
-                    'hidden =' => 0
+                    'Cats.hidden =' => 0
                 ])
                 ->order(['Cats.created' => 'DESC']);
         }
@@ -353,7 +353,7 @@ class CatsCommonComponent extends Component {
                 ->contain(['Questions']);
         }])
         ->where([
-            'hidden =' => 0
+            'Cats.hidden =' => 0
         ])
         ->matching('Tags', function ($q) use ($tag) {
             return $q->where(['Tags.tag =' => $tag]);
