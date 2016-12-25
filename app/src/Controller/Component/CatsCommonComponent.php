@@ -253,22 +253,20 @@ class CatsCommonComponent extends Component {
         if($order === "popular"){
             $query = $this->Cats->find('all');
             $query ->leftJoinWith('Favorites')
-                // ->leftJoinWith('Comments')
                 ->select($this->Cats)
                 ->select($this->Cats->Users)
                 ->select(['count' => $query->func()->count('Favorites.id')])
-                // ->select(['count2' => $query->func()->count('Comments.id')])
-                ->contain(['CatImages', 
-                'Comments'=> function ($q) {
-                    return $q->order(['Comments.created' => 'DESC']);
-                }, 
-                'Users', 'Favorites', 
-                'Answers'=> function ($q) {
-                   return $q
-                        ->where([
-                            'Questions.name =' => 'name'
-                        ])
-                        ->contain(['Questions']);
+                ->contain([
+                    'CatImages', 'Users', 'Favorites', 
+                    'Comments'=> function ($q) {
+                        return $q->order(['Comments.created' => 'DESC']);
+                    }, 
+                    'Answers'=> function ($q) {
+                       return $q
+                            ->where([
+                                'Questions.name =' => 'name'
+                            ])
+                            ->contain(['Questions']);
                 }])
                 ->where([
                     'hidden =' => 0

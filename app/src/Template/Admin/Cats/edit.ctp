@@ -19,6 +19,7 @@
             echo $this->Form->input('locate');
             echo $this->Form->input('flg');
             echo $this->Form->input('address');
+            echo $this->Form->input('hidden');
             // echo $this->Form->input('status');
             echo $this->Form->input(
                 'ear_shape',

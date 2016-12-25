@@ -248,5 +248,4 @@ Type::build('datetime')
 
 Plugin::load('Cake/Localized');
 
-
 Plugin::load('ADmad/JwtAuth');
