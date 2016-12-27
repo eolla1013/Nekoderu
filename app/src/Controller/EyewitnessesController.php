@@ -52,7 +52,7 @@ class EyewitnessesController extends AppController
         
         if ($this->request->is('post')) {
             
-            $this->EyewitnessImages = TableRegistry::get('EyewitnessImages');
+            // $this->EyewitnessImages = TableRegistry::get('EyewitnessImages');
             
             $data = $this->request->data;
             
@@ -64,6 +64,7 @@ class EyewitnessesController extends AppController
             $witness->user_id = $uid;
             $witness->cat_id = $cat_id;
             $witness->content = $comment;
+            
             
             if ($this->Eyewitnesses->save($witness)) {
                 if($this->Flash){
@@ -79,12 +80,13 @@ class EyewitnessesController extends AppController
             
             if (isset($data["image"])) {
                 
+                
                 for($i=0; $i<count($data["image"]); $i++){
                     if(is_uploaded_file($data["image"][$i]["tmp_name"])){
                     
                         // アップロード処理
                         $file = $data["image"][$i];
-                        $this->saveWitnessImage($file, $cat->id, $uid);
+                        $this->saveWitnessImage($file, $cat->id, $uid, $witness);
                     }
                 }
             }
@@ -96,7 +98,7 @@ class EyewitnessesController extends AppController
         $this->set('_serialize', ['cat']);
     }
     
-     public function saveWitnessImage($file, $cat_id, $uid){
+     public function saveWitnessImage($file, $cat_id, $uid, $witness){
         
         $savePath = $this->NekoUtil->safeImage($file["tmp_name"], TMP);
         if ($savePath === "") {
@@ -114,15 +116,20 @@ class EyewitnessesController extends AppController
         $thumbnail = $this->NekoUtil->s3Upload($savePath, '');
         // 書きだした画像を削除
         @unlink($savePath);
-
+     
+         
         if ($result) {
+            
             $catImage = $this->Eyewitnesses->EyewitnessImages->newEntity();
             $catImage->url = $result['ObjectURL'];
             $catImage->thumbnail = $thumbnail['ObjectURL'];
             $catImage->users_id = $uid;
             $catImage->cats_id = $cat_id;
+            $catImage->eyewitness_id = $witness->id;
+            
             if ($this->Eyewitnesses->EyewitnessImages->save($catImage)) {
                 // $this->Flash->success('画像を保存しました。');
+                
                 return $catImage;
             }
         }
