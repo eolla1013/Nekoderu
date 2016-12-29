@@ -230,10 +230,12 @@ $(function(){
                     <div>
                         <?php foreach ($cat->comments as $idx => $comment): ?>
                             <?php if($idx >= 3) break; ?>
-                            <?php if(!is_null(json_decode($comment->comment))): ?>
-                                <div class="grid-comment"><?= json_decode($comment->comment, true)['comment'] ?></div>
-                            <?php else: ?>
-                                <div class="grid-comment"><?= $comment->comment ?></div>
+                            <?php if(count($comment->reports) <= 0): ?>
+                                <?php if(!is_null(json_decode($comment->comment))): ?>
+                                    <div class="grid-comment"><?= json_decode($comment->comment, true)['comment'] ?></div>
+                                <?php else: ?>
+                                    <div class="grid-comment"><?= $comment->comment ?></div>
+                                <?php endif; ?>
                             <?php endif; ?>
                         <?php endforeach; ?>
                     </div>

@@ -257,7 +257,7 @@ class CatsCommonComponent extends Component {
                 ->select($this->Cats->Users)
                 ->select(['count' => $query->func()->count('Favorites.id')])
                 ->contain([
-                    'CatImages', 'Users', 'Favorites', 
+                    'CatImages', 'Users', 'Favorites', 'Comments.Reports',
                     'Comments'=> function ($q) {
                         return $q->order(['Comments.created' => 'DESC']);
                     }, 
@@ -285,11 +285,11 @@ class CatsCommonComponent extends Component {
                 ->select($this->Cats->Users)
                 // ->select(['count' => $query->func()->count('Favorites.id')])
                 ->select(['last' => $query->func()->max('Comments.created')])
-                ->contain(['CatImages', 
+                ->contain(['CatImages', 'Comments.Reports',
                 'Comments'=> function ($q) {
                     return $q->order(['Comments.created' => 'DESC']);
                 }, 
-                'Users', 'Favorites', 
+                'Users', 'Favorites',
                 'Answers'=> function ($q) {
                    return $q
                         ->where([
@@ -307,7 +307,7 @@ class CatsCommonComponent extends Component {
                 // debug($query->first());
         } else if($order === "recent")  { 
             $query = $this->Cats->find('all')
-                ->contain(['CatImages', 
+                ->contain(['CatImages', 'Comments.Reports',
                 'Comments'=> function ($q) {
                     return $q->order(['Comments.created' => 'DESC']);
                 }, 
