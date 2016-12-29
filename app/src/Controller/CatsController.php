@@ -534,12 +534,13 @@ class CatsController extends AppController
             
             $report->description = $data['description'];
             $report->cat_id = $data['cat_id'];
-            $report->comment_id = $data['comment_id'];
+            if($data['comment_id'] !== '0')
+                $report->comment_id = $data['comment_id'];
             $report->user_id = $this->Auth->user()['id'];
-
+            
+            
             if($this->Report->save($report)) {
-                
-                if($report->comment_id === 0){
+                if($data['comment_id'] === '0'){
                     $cat = $this->Cats->get($report->cat_id);
                     $cat->hidden = true;
                     if($this->Cats->save($cat)){

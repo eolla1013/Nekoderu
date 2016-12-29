@@ -340,7 +340,7 @@ class CatsCommonComponent extends Component {
         $this->Tags = TableRegistry::get('Tags');
             
         $data = $this->Cats->find('all')
-        ->contain(['CatImages',  
+        ->contain(['CatImages', 'Comments.Reports',
         'Comments'=> function ($q) {
             return $q->order(['Comments.created' => 'DESC']);
         },  
