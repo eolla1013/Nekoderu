@@ -30,14 +30,14 @@
                 'enctype' => 'multipart/form-data'
             ]);
         ?>
-        <!--<h6 id='report-target'>レポート対象</h6>-->
         <?php
             echo $this->Form->input('cat_id', ['type' => 'hidden', 'id' => 'report-cat-id']);
+            echo $this->Form->input('comment_id', ['type' => 'hidden', 'id' => 'report-comment-id']);
             echo $this->Form->textarea('description', [
                 'id' => 'report-description', 
                 'required' => true,
                 'label' => false, 
-                'placeholder' => 'ねこちゃんの位置が特定されてしまう写真やコメントが掲載されている、公序良俗に反する内容であるなどご報告ください。'
+                'placeholder' => 'ねこちゃんの位置が特定されてしまう内容が掲載されている、公序良俗に反する場合ななどご報告ください。'
             ]);
         ?>
         <?php
@@ -82,7 +82,7 @@
             <?php if($auth && $cat->user && ($auth['is_superuser'] || $auth['id'] == $cat->user->id || $auth['id'] == $eyewitness->user->id)): ?>
             <div class="w3-panel w3-leftbar w3-sand">
                 <div class="chat-info">
-                    目撃情報：<span class="chat-id"><a href="/profiles/user/<?= h($eyewitness->user->username) ?>" >@<?= h($eyewitness->user->username) ?></a></span> - <span class="chat-time"><?= h($eyewitness->created) ?></span></div>
+                    目撃情報：<span class="chat-id"><a href="/profiles/user/<?= h($eyewitness->user->username) ?>" >@<?= h($eyewitness->user->username) ?></a></span> - <span class="chat-time"><?= h($eyewitness->created) ?></span> - <span class="chat-time"><?= h($eyewitness->created) ?></span></div>
                 <div>
                     <?= $eyewitness->content ?>
                 </div>
@@ -191,11 +191,15 @@
                 <div class="chat-face">
     			    <img src="" width="30" height="30">
     		    </div>
-    		    <div class="chat-info"><span class="chat-id">id here</span> - <span class="chat-time">time here</span></div>
+    		    <div class="chat-info"><span class="chat-id">id here</span> - <span class="chat-time">time here</span> <span class="chat-report">icon</span></div>
     			<div class="chat-fukidashi">
     			  コメントテンプレート
     			</div>
     		    <div class="chat-menu"><a href="#" class="chat-trash"><i class="glyphicon glyphicon-trash"></i></a></div>
+    		    <div class="chat-reported">
+    		        <div>内容が不適切の報告があり非表示にしました</div>
+    		        <ul class="reason"></ul>
+    		    </div>
       	    </div>
         </div>
     </div>
@@ -299,6 +303,17 @@ input[type="text"] {
     padding-bottom: 10px;
 }
 
+.reported {
+    text-decoration: line-through;
+    color: gray;
+    font-size: small;
+}
+
+.chat-reported, .chat-reported ul li {
+    font-size: small;
+    color: gray;
+}
+
 </style>
 
 <script>
@@ -308,6 +323,7 @@ $(function(){
     setModal("modal-report", ".report-form", function(name, e){
         var cat_id = $(e.target).parent().attr('target')
         $('#report-cat-id').attr('value', cat_id);
+        $('#report-comment-id').attr('value', 0);
         $('#report-description').attr('value', "");
         // $('#report-target').html('対象：<a target="_blank" href="/cats/view/' + cat_id + '">#' + cat_id + '</a>');
     });
@@ -346,6 +362,10 @@ var updateComments = function(data){
         var url;
         var cln = template.comment.clone();
         
+        if(this.reports.length > 0){
+            cln.addClass("w3-panel w3-warning");
+        }
+        
         if(isJSON(this.comment)){
             var data = $.parseJSON(this.comment);
             var part = '<div>';
@@ -358,9 +378,23 @@ var updateComments = function(data){
             
         }else{
             cln.find('.chat-fukidashi').text(this.comment);
+            
         }
         cln.find('.chat-id').html('<a href="/profiles/user/'+this.user.username+'">@'+this.user.username+'</a>');
         cln.find('.chat-time').text(new Date(this.created).toTwitterRelativeTime('ja') );
+        if(this.reports.length > 0){
+            cln.find('.chat-report').remove();
+            cln.find('.chat-fukidashi').addClass('reported');
+            cln.find('.chat-reported .reason').html("<li>"+this.reports[0].description+"</li>");
+        }else{
+            cln.find('.chat-reported').remove();
+            cln.find('.chat-report').html(
+                '<a role="button"'
+                    +' class=" encourage-popup btn btn-default btn-xs comment-report-form"'
+                    +' target-cat="<?= $cat->id ?>" target-comment="'+this.id+'">'
+                        +'<span class="glyphicon glyphicon glyphicon-bullhorn" aria-hidden="true"></span>'
+                    +'</a>');
+        }
         
 		taggify(cln, '.chat-fukidashi');
 		linkify(cln, '.chat-fukidashi');
@@ -421,6 +455,14 @@ var updateComments = function(data){
        $("#comments").append(cln);
        cln.show();
     });
+    setModal("modal-report", ".comment-report-form", function(name, e){
+        var cat_id = $(e.target).parent().attr('target-cat');
+        var comment_id = $(e.target).parent().attr('target-comment');
+        $('#report-cat-id').attr('value', cat_id);
+        $('#report-comment-id').attr('value', comment_id);
+        $('#report-description').attr('value', "");
+    });
+        
     if($(".comment:first").length > 0){
         $(".comment:first").hide();
         $(".comment:first").slideDown(100);

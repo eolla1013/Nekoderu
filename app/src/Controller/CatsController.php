@@ -372,11 +372,23 @@ class CatsController extends AppController
             
             $comments = $this->Cats->Comments
                 ->find('all', ['order' => ['Comments.created' => 'DESC']])
+                ->contain(['Users', 'Reports'])
                 ->where(['Comments.cats_id =' => $cats_id])
-                ->contain(['Users'])
                 ->limit(20)
                 ->all();
-        
+                
+            
+            //不適切報告があったメッセージは投稿者以外の場合は空にする
+            $comments = $comments->toArray();
+            $uid = $this->Auth->user('id');
+            foreach($comments as $key=>$comment){
+                if(count($comment->reports) && $comment->users_id !== $uid){
+                    $comment->comment = "";
+                    unset($comments[$key]);
+                }
+            }
+            // array_values($comments);
+            
             $this->set(compact('comments'));
             $this->set('_serialize', ['comments']);
             
@@ -522,13 +534,17 @@ class CatsController extends AppController
             
             $report->description = $data['description'];
             $report->cat_id = $data['cat_id'];
+            $report->comment_id = $data['comment_id'];
             $report->user_id = $this->Auth->user()['id'];
 
             if($this->Report->save($report)) {
-                $cat = $this->Cats->get($report->cat_id);
                 
-                $cat->hidden = true;
-                if($this->Cats->save($cat)){
+                if($report->comment_id === 0){
+                    $cat = $this->Cats->get($report->cat_id);
+                    $cat->hidden = true;
+                    if($this->Cats->save($cat)){
+                    }
+                }else{
                     
                 }
             }

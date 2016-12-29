@@ -18,6 +18,10 @@ class TestsController extends AppController
         
     }
     
+    public function setVisibilityTest(){
+        
+    }
+    
     /***
      * Vision APIで猫が写っているか確認するサンプル
      * 
