@@ -87,9 +87,9 @@ class ReportsController extends AppController
                 $this->Flash->error(__('The report could not be saved. Please, try again.'));
             }
         }
-        $users = $this->Reports->Users->find('list', ['limit' => 200]);
-        $cats = $this->Reports->Cats->find('list', ['limit' => 200]);
-        $comments = $this->Reports->Comments->find('list', ['limit' => 200]);
+        $users = $this->Reports->Users->find('list');
+        $cats = $this->Reports->Cats->find('list');
+        $comments = $this->Reports->Comments->find('list');
         $this->set(compact('report', 'users', 'cats', 'comments'));
         $this->set(compact('report', 'users', 'cats'));
         $this->set('_serialize', ['report']);
