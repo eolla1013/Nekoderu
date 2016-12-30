@@ -52,6 +52,7 @@
     <div class="row">
         <h4><?= __('Comments') ?></h4>
         <?php foreach ($cat->comments as $comment): ?>
+            <?= $comment->id ?>:
             <?= $this->Text->autoParagraph(h($comment->comment)); ?>
         <?php endforeach; ?>
     </div>

@@ -33,7 +33,7 @@ class ReportsController extends AppController
     public function view($id = null)
     {
         $report = $this->Reports->get($id, [
-            'contain' => ['Users', 'Cats']
+            'contain' => ['Users', 'Cats', 'Comments']
         ]);
 
         $this->set('report', $report);
@@ -60,7 +60,8 @@ class ReportsController extends AppController
         }
         $users = $this->Reports->Users->find('list', ['limit' => 200]);
         $cats = $this->Reports->Cats->find('list', ['limit' => 200]);
-        $this->set(compact('report', 'users', 'cats'));
+        $comments = $this->Reports->Comments->find('list', ['limit' => 200]);
+        $this->set(compact('report', 'users', 'cats', 'comments'));
         $this->set('_serialize', ['report']);
     }
 
@@ -88,6 +89,8 @@ class ReportsController extends AppController
         }
         $users = $this->Reports->Users->find('list', ['limit' => 200]);
         $cats = $this->Reports->Cats->find('list', ['limit' => 200]);
+        $comments = $this->Reports->Comments->find('list', ['limit' => 200]);
+        $this->set(compact('report', 'users', 'cats', 'comments'));
         $this->set(compact('report', 'users', 'cats'));
         $this->set('_serialize', ['report']);
     }

@@ -22,6 +22,7 @@
             echo $this->Form->input('description');
             echo $this->Form->input('user_id', ['options' => $users]);
             echo $this->Form->input('cat_id', ['options' => $cats]);
+            echo $this->Form->input('comment_id', ['options' => $comments]);
         ?>
     </fieldset>
     <?= $this->Form->button(__('Submit')) ?>
