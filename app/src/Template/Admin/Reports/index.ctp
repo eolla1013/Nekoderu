@@ -17,6 +17,7 @@
                 <th scope="col"><?= $this->Paginator->sort('description') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('user_id') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('cat_id') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('comment_id') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('created') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('modified') ?></th>
                 <th scope="col" class="actions"><?= __('Actions') ?></th>
@@ -27,8 +28,9 @@
             <tr>
                 <td><?= $this->Number->format($report->id) ?></td>
                 <td><?= h($report->description) ?></td>
-                <td><?= $report->has('user') ? $this->Html->link($report->user->id, ['controller' => 'Users', 'action' => 'view', $report->user->id]) : '' ?></td>
-                <td><?= $report->has('cat') ? $this->Html->link($report->cat->id, ['controller' => 'Cats', 'action' => 'view', $report->cat->id]) : '' ?></td>
+                <td><?= $report->has('user_id') ? $this->Html->link($report->user_id, ['controller' => 'Users', 'action' => 'view', $report->user_id]) : '' ?></td>
+                <td><?= $report->has('cat_id') ? $this->Html->link($report->cat_id, ['controller' => 'Cats', 'action' => 'view', $report->cat_id]) : '' ?></td>
+                <td><?= $report->has('comment_id') ? $this->Html->link($report->comment_id, ['controller' => 'Comments', 'action' => 'view', $report->comment_id]) : '' ?></td>
                 <td><?= h($report->created) ?></td>
                 <td><?= h($report->modified) ?></td>
                 <td class="actions">

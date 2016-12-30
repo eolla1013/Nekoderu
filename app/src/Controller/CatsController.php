@@ -370,6 +370,53 @@ class CatsController extends AppController
                 $limit = 20;
             }
             
+           
+            
+            // $matchingComment = $this->Cats->Comments->find('all');
+            
+            // $matchingComment = $matchingComment
+            //     ->leftJoinWith('Reports')
+            //     ->select(['Comments.id', 'Comments.cats_id', 'Comments.created'])
+            //     ->select(['report_counts' => $matchingComment->func()->count('Reports.id')])
+            //     ->group('Comments.id')
+            //     ->having(['report_counts <' => 1])
+            //     ->where(['Comments.cats_id =' => $cats_id])
+            //     ->order(['Comments.created' => 'DESC'])
+            //     ->distinct()
+            //     ;
+            // debug($matchingComment->all()->toArray());
+            
+            // debug(array_column($matchingComment->all()->toArray(), 'id'));
+        
+            // $comments = $this->Cats->Comments->find()
+            //     ->where(['id' => $matchingComment]);
+            
+// $connection = \Cake\Datasource\ConnectionManager::get('default'); // DB接続を取得
+// $connection->logQueries(true); // SQL Queryのログ出力を有効化
+
+
+//             $comments = $this->Cats->Comments
+//                 ->find('all');
+//             $comments = $comments
+//                 ->leftJoinWith('Reports')
+//                 ->select($this->Cats->Comments)
+//                 ->select($this->Cats->Users)
+//                 // ->select($this->Cats->Reports)
+//                 ->select(['report_counts' => $comments->func()->count('Reports.id')])
+//                 ->contain(['Users', 'Reports'])
+//                 ->group('Comments.id')
+//                 ->having(['report_counts <' => 1])
+//                 ->where(['Comments.cats_id =' => $cats_id])
+//                 ->order(['Comments.created' => 'DESC'])
+//                 ->limit(20)
+//                 ->all();
+                
+// $connection->logQueries(false); // SQL Queryのログ出力を無効化
+                
+//                 debug($comments);
+//                 exit;
+            
+            $uid = $this->Auth->user('id');
             $comments = $this->Cats->Comments
                 ->find('all', ['order' => ['Comments.created' => 'DESC']])
                 ->contain(['Users', 'Reports'])
@@ -377,7 +424,6 @@ class CatsController extends AppController
                 ->limit(20)
                 ->all();
                 
-            
             //不適切報告があったメッセージは投稿者以外の場合は空にする
             $comments = $comments->toArray();
             $uid = $this->Auth->user('id');
@@ -387,7 +433,7 @@ class CatsController extends AppController
                     unset($comments[$key]);
                 }
             }
-            // array_values($comments);
+            array_values($comments);
             
             $this->set(compact('comments'));
             $this->set('_serialize', ['comments']);

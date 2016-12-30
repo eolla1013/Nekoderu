@@ -16,10 +16,8 @@ class ReportsController extends AppController
      */
     public function index()
     {
-        $this->paginate = [
-            'contain' => ['Users', 'Cats']
-        ];
-        $reports = $this->paginate($this->Reports);
+        $reports = $this->Reports->find('all')->contain(['Users', 'Cats', 'Comments']);
+        $reports = $this->paginate($report);
 
         $this->set(compact('reports'));
         $this->set('_serialize', ['reports']);

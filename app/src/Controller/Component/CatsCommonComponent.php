@@ -259,8 +259,14 @@ class CatsCommonComponent extends Component {
                 ->contain([
                     'CatImages', 'Users', 'Favorites', 'Comments.Reports',
                     'Comments'=> function ($q) {
-                        return $q->order(['Comments.created' => 'DESC']);
-                    }, 
+                        return $q
+                            ->leftJoinWith('Reports')
+                            ->select($this->Cats->Comments)
+                            ->select(['report_counts' => $q->func()->count('Reports.id')])
+                            ->group('Comments.id')
+                            ->having(['report_counts <' => 1])
+                            ->order(['Comments.created' => 'DESC']);
+                    },
                     'Answers'=> function ($q) {
                        return $q
                             ->where([
@@ -275,7 +281,6 @@ class CatsCommonComponent extends Component {
                 ->order(['count' => 'DESC'])
                 ;
                 
-                // debug($query->first());
         } else if($order === "commented") {
             $query = $this->Cats->find('all');
             $query 
@@ -287,7 +292,13 @@ class CatsCommonComponent extends Component {
                 ->select(['last' => $query->func()->max('Comments.created')])
                 ->contain(['CatImages', 'Comments.Reports',
                 'Comments'=> function ($q) {
-                    return $q->order(['Comments.created' => 'DESC']);
+                    return $q
+                            ->leftJoinWith('Reports')
+                            ->select($this->Cats->Comments)
+                            ->select(['report_counts' => $q->func()->count('Reports.id')])
+                            ->group('Comments.id')
+                            ->having(['report_counts <' => 1])
+                            ->order(['Comments.created' => 'DESC']);
                 }, 
                 'Users', 'Favorites',
                 'Answers'=> function ($q) {
@@ -304,12 +315,18 @@ class CatsCommonComponent extends Component {
                 ->order(['last' => 'DESC'])
                 ;
                 
-                // debug($query->first());
+                // debug($query->toArray());
         } else if($order === "recent")  { 
             $query = $this->Cats->find('all')
                 ->contain(['CatImages', 'Comments.Reports',
                 'Comments'=> function ($q) {
-                    return $q->order(['Comments.created' => 'DESC']);
+                    return $q
+                            ->leftJoinWith('Reports')
+                            ->select($this->Cats->Comments)
+                            ->select(['report_counts' => $q->func()->count('Reports.id')])
+                            ->group('Comments.id')
+                            ->having(['report_counts <' => 1])
+                            ->order(['Comments.created' => 'DESC']);
                 }, 
                 'Users', 'Favorites', 
                 'Answers'=> function ($q) {
@@ -323,6 +340,7 @@ class CatsCommonComponent extends Component {
                     'Cats.hidden =' => 0
                 ])
                 ->order(['Cats.created' => 'DESC']);
+                
         }
             
         if(!is_null($users_id)){ 
