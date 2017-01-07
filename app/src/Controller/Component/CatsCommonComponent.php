@@ -23,7 +23,6 @@ class CatsCommonComponent extends Component {
         $this->Controller->set(compact('questions'));
         $this->Controller->set('_serialize', ['questions']);
         
-        
         if ($this->Controller->request->is('post')) {
             
             $data = $this->Controller->request->data;
@@ -81,15 +80,20 @@ class CatsCommonComponent extends Component {
             if(mb_strlen($comment) > 0){
                 $this->addComment($comment, $cat->id, $uid);
             }
-           
+            
+            if (isset($data['file'])){
+                $file = $data['file'];
+                $savePath = $this->NekoUtil->saveGif($file["tmp_name"], TMP);
+                $this->saveCatMovie($savePath, $cat->id, $uid, false);
+            }
+                
             if (isset($data["image"])) {
                 
                 for($i=0; $i<count($data["image"]); $i++){
                     if(is_uploaded_file($data["image"][$i]["tmp_name"])){
-                    
                         // アップロード処理
                         $file = $data["image"][$i];
-                        $this->saveCatImage($file, $cat->id, $uid);
+                        $this->saveCatImage($file["tmp_name"], $cat->id, $uid);
                     }
                 }
             }
@@ -102,30 +106,32 @@ class CatsCommonComponent extends Component {
         }
     }
     
-    public function saveCatImage($file, $cat_id, $uid){
+    public function saveImageOnAWS($file, $cat_id, $uid, $thumbnailing = true) {
         
-        $savePath = $this->NekoUtil->safeImage($file["tmp_name"], TMP);
-        if ($savePath === "") {
-            die("不正な画像がuploadされました");
-        }
-        $result = $this->NekoUtil->s3Upload($savePath, '');
+        $result = $this->NekoUtil->s3Upload($file, '');
         // 書きだした画像を削除
         @unlink($savePath);
         
-        //サムネイルを作成
-        $savePath = $this->NekoUtil->createThumbnail($file["tmp_name"], TMP);
-        if ($savePath === "") {
-            die("不正な画像がuploadされました");
+        if($thumbnailing){
+            //サムネイルを作成
+            $savePath = $this->NekoUtil->createThumbnail($file, TMP);
+            if ($savePath === "") {
+                die("不正な画像がuploadされました");
+            }
+            $thumbnail = $this->NekoUtil->s3Upload($savePath, '');
+            // 書きだした画像を削除
+            @unlink($savePath);
         }
-        $thumbnail = $this->NekoUtil->s3Upload($savePath, '');
-        // 書きだした画像を削除
-        @unlink($savePath);
 
         if ($result) {
             
             $catImage = $this->Controller->Cats->CatImages->newEntity();
             $catImage->url = $result['ObjectURL'];
-            $catImage->thumbnail = $thumbnail['ObjectURL'];
+            if($thumbnailing){
+                $catImage->thumbnail = $thumbnail['ObjectURL'];
+            }else{
+                $catImage->thumbnail = $result['ObjectURL'];
+            }
             $catImage->users_id = $uid;
             $catImage->cats_id = $cat_id;
             if ($this->Controller->Cats->CatImages->save($catImage)) {
@@ -133,8 +139,19 @@ class CatsCommonComponent extends Component {
                 return $catImage;
             }
         }
-        return null;
+    }
+    
+    public function saveCatMovie($file, $cat_id, $uid, $thumbnailing = true){
+        return $this->saveImageOnAWS($file, $cat_id, $uid, false);
+    }
+    
+    public function saveCatImage($file, $cat_id, $uid, $thumbnailing = true){
         
+        $savePath = $this->NekoUtil->safeImage($file, TMP);
+        if ($savePath === "") {
+            die("不正な画像がuploadされました");
+        }
+        return $this->saveImageOnAWS($savePath, $cat_id, $uid, true);
     }
     
     private function addTag($value){

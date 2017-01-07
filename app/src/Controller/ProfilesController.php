@@ -218,6 +218,10 @@ class ProfilesController extends AppController
      */
     public function registration()
     {
+        debug("registration");
+        debug($this->query);
+        exit;
+        
         $this->eventManager()->on(UsersAuthComponent::EVENT_AFTER_REGISTER, function ($e) {
             $session = $this->request->session();
             $cat = $session->read('Last.Submit.Cat.Data');

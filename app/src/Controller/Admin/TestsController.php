@@ -22,6 +22,9 @@ class TestsController extends AppController
         
     }
     
+    public function videoUpload(){
+    }
+    
     /***
      * Vision APIで猫が写っているか確認するサンプル
      * 
@@ -65,6 +68,7 @@ class TestsController extends AppController
      public function oauth2callback(){
         $this->GoogleApi->oauth2callback();
     }
+    
     
     
     public function mail(){

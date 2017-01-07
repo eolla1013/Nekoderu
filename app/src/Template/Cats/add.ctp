@@ -58,8 +58,16 @@
 ?>
     <div class="box">
         <div class="memo-title">
-            １．写真を選ぶ <sup class="required">※必須</sup>
-            <?= $this->element('partial/multi_image_selector'); ?>
+            １．<a href="#" id="photo">写真</a> or <a href="#" id="movie">動画</a> を選ぶ <sup class="required">※必須</sup>
+            <div id="multi-image-selector">
+                <?= $this->element('partial/multi_image_selector'); ?>
+            </div>
+            <div id="movie-selector">
+                <?= $this->element('partial/movie_selector'); ?>
+            </div>
+            <div id="selector-form">
+                
+            </div>
         </div>
     </div>
     <div id='now' class="box">
@@ -150,6 +158,29 @@
 <!--<div class="map-rapper">-->
 <!--    <div id="map" class="map"></div>-->
 <!--</div>-->
+
+<script>
+$(function(){
+    var multiImage = $("#multi-image-selector").clone();
+    var movie = $("#movie-selector").clone();
+     $("#multi-image-selector").remove();
+     $("#movie-selector").remove();
+     
+    
+    $("#movie").click(function(){
+        $("#selector-form").empty();
+        $("#selector-form").append(movie.clone());
+        initialize_movie();
+    });
+    $("#photo").click(function(){
+        $("#selector-form").empty();
+        $("#selector-form").append(multiImage.clone());
+        initialize_images();
+    });
+    
+    $("#photo").click();
+});
+</script>
 <script>
 $(function(){
     setModal("modal-ear", "#ear-info", null);
@@ -159,8 +190,8 @@ $(function(){
 
 $("form").submit(function(e) {
     
-    if($('.button-file').length < 2){
-        alert("写真を選んでください");
+    if($('.button-file').length < 2 && $("#video-input").val().length <= 0){
+        alert("写真かムービーを選んでください");
 
         e.preventDefault();
         return false;

@@ -25,6 +25,7 @@ var createTemplate = function(selector, name){
 
 function setModal(id, btn, callback){
     var modal = $("#"+id);
+    modal.css('z-index', '999');
    
     $(window).click(function(e) {
         // e.preventDefault();

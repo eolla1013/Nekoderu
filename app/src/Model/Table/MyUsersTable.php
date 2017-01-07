@@ -34,4 +34,16 @@ class MyUsersTable extends UsersTable
         ]);
     }
     
+     // In a table class
+    public function buildRules(RulesChecker $rules)
+    {
+        parent::buildRules($rules);
+        $rules->add($rules->isUnique(['email']), '_isUnique', [
+            'errorField' => 'email',
+            'message' => __d('CakeDC/Users', 'Email already exists')
+        ]);
+    
+        return $rules;
+    }
+    
 }

@@ -135,6 +135,37 @@ class NekoUtilComponent extends Component {
 
         return $outputFilePath;
     }
+    
+    /**
+     * 動画をGifにして保存する
+     * TODO: @utsumi-k PHP Parserを使うかは場合は別途用意する
+     * @param $orgFilePath
+     * @param $exportFilePath
+     *
+     * @return string
+     */
+    function saveGif($orgFilePath, $exportFilePath) {
+        // 書き出しファイル名を生成
+        $outputFilePath = $exportFilePath . "/" . $this->generateUniqueFileName(".gif");
+
+        
+        // $thumb_stdout;
+        // $errors;
+        // $retval = 0;
+
+        // Delete the file if it already exists
+        if (file_exists($outputFilePath)) { 
+            unlink($outputFilePath); 
+        }
+        // $cmd  = "ffmpeg -i $in -ar 22050 -acodec libmp3lame -ab 32K -r 25 -s 320x240 -vcodec gif $outputFilePath";
+        $cmd  = "ffmpeg -i $orgFilePath -vf 'scale=480:-1' $outputFilePath";
+        
+        exec(escapeshellcmd($cmd));
+        unlink($orgFilePath);
+        
+        return $outputFilePath;
+
+    }
    
     /**
      * 一度画像を別の形式に変換し、jpg形式に変換する
@@ -228,8 +259,8 @@ class NekoUtilComponent extends Component {
      * TODO: 絶対かぶらない保証もないし、非同期で保存されるけど、今んとこそこは危惧するレベルではないと判断
      * @return string
      */
-    function generateUniqueFileName() {
-        return md5(uniqid(rand(),1)) . ".jpg";
+    function generateUniqueFileName($ext = ".jpg") {
+        return md5(uniqid(rand(),1)) . $ext;
     }
 
 

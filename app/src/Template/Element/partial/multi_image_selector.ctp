@@ -47,8 +47,11 @@
 </div>
 
 <script>
-
-$(function(){
+function initialize_images(){
+    
+    console.log("image-initialize");
+    
+(function(){
     //複数の画像ファイルアップロードに関する処理
     var numFile = 0;
     addListener(document.getElementById('image_'+numFile));
@@ -111,5 +114,7 @@ $(function(){
             reader.readAsDataURL(f);
         };
     }
-});
+})();
+
+}
 </script>

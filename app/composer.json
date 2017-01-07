@@ -24,7 +24,8 @@
         "friendsofcake/bootstrap-ui": "^0.5.0",
         "google/apiclient": "^2.0",
         "cakephp/localized": "^3.0",
-        "admad/cakephp-jwt-auth": "^2.0"
+        "admad/cakephp-jwt-auth": "^2.0",
+        "codescale/ffmpeg-php": "dev-master"
     },
     "require-dev": {
         "psy/psysh": "@stable",

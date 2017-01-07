@@ -1,118 +1,7 @@
 <script src="https://unpkg.com/imagesloaded@4.1/imagesloaded.pkgd.min.js"></script>
 <script src="//unpkg.com/masonry-layout@4.1/dist/masonry.pkgd.min.js"></script>
 <script src="/js/jquery.infinitescroll.js"></script>
-<style>
-    .grid-sizer, .grid-item { 
-        width: 48%;
-        padding: 5px;
-        box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.2);
-        margin-bottom: 8px;
-        border-radius: 5px;
-    }
-    .grid-sizer {
-        visibility: hidden;
-    }
-    .grid-item--width2 { 
-        width: 80%; 
-    }
-    
-    .gutter-sizer { 
-        width: 2%; 
-    }
-    
-    .grid-buttons{
-        margin-top: 3px;
-    }
-    
-    .grid-comment{
-        font-size:12px;
-        padding: 2px;
-        padding-left: 10px;
-        word-break: break-all;
-    }
-    
-    .btn-default {
-        background-image: none;
-    }
-    
-    .grid {
-        padding-bottom: 150px;
-    }
-    
-    #add-neko{
-        background-color: white;
-        border-width: 1px;
-        border-color: gray;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        height: 50px;
-        left: 0;
-    }
-    
-    #add-neko a {
-      position: absolute;
-      top: 50%;
-      left: 42%;
-      transform: translate(-20%, -50%);
-    }
-    
-    .favorited {
-        color: #ffa500 !important;
-    }
-    
-    .mfp-iframe-holder .mfp-content{
-        height: 100%;
-    }
-    
-    li.disabled{
-        list-style: none;
-    }
-    
-    .disabled a{
-        color:black;
-    }
-    
-    .more-images{
-        position: absolute;
-        right: 10px;
-        font-size: 2rem;
-        color: rgba(255,255,255,0.8);
-    }
-    
-    .name{
-        position: absolute;
-        left: 10px;
-        bottom: 5px;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        width : 95%; /*fallback*/
-        width : calc(100% - 20px) ;
-        overflow: hidden;
-        font-size: 1rem;
-        color: rgba(255,255,255,0.8);
-    }
-    
-    .notification-count{
-        top: 50%;
-        right: 50px;
-        transform: translate(0, -50%);
-        position: absolute;
-    }
-    
-    .notification-count span {
-        color : red;
-    }
-    
-    .white-popup {
-        position: relative;
-        background: #FFF;
-        padding: 20px;
-        width: auto;
-        margin: 20px auto;
-    }
 
-</style>
 <?php 
     $ear_images = ['normal', 'donno', 'trimmed_right', 'trimmed_left'];
 ?>
@@ -437,6 +326,119 @@ $(function(){
   
 });
 </script>
+
+<style>
+    .grid-sizer, .grid-item { 
+        width: 48%;
+        padding: 5px;
+        box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.2);
+        margin-bottom: 8px;
+        border-radius: 5px;
+    }
+    .grid-sizer {
+        visibility: hidden;
+    }
+    .grid-item--width2 { 
+        width: 80%; 
+    }
+    
+    .gutter-sizer { 
+        width: 2%; 
+    }
+    
+    .grid-buttons{
+        margin-top: 3px;
+    }
+    
+    .grid-comment{
+        font-size:12px;
+        padding: 2px;
+        padding-left: 10px;
+        word-break: break-all;
+    }
+    
+    .btn-default {
+        background-image: none;
+    }
+    
+    .grid {
+        padding-bottom: 150px;
+    }
+    
+    #add-neko{
+        background-color: white;
+        border-width: 1px;
+        border-color: gray;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 50px;
+        left: 0;
+    }
+    
+    #add-neko a {
+      position: absolute;
+      top: 50%;
+      left: 42%;
+      transform: translate(-20%, -50%);
+    }
+    
+    .favorited {
+        color: #ffa500 !important;
+    }
+    
+    .mfp-iframe-holder .mfp-content{
+        height: 100%;
+    }
+    
+    li.disabled{
+        list-style: none;
+    }
+    
+    .disabled a{
+        color:black;
+    }
+    
+    .more-images{
+        position: absolute;
+        right: 10px;
+        font-size: 2rem;
+        color: rgba(255,255,255,0.8);
+    }
+    
+    .name{
+        position: absolute;
+        left: 10px;
+        bottom: 5px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width : 95%; /*fallback*/
+        width : calc(100% - 20px) ;
+        overflow: hidden;
+        font-size: 1rem;
+        color: rgba(255,255,255,0.8);
+    }
+    
+    .notification-count{
+        top: 50%;
+        right: 50px;
+        transform: translate(0, -50%);
+        position: absolute;
+    }
+    
+    .notification-count span {
+        color : red;
+    }
+    
+    .white-popup {
+        position: relative;
+        background: #FFF;
+        padding: 20px;
+        width: auto;
+        margin: 20px auto;
+    }
+
+</style>
 
 <link rel="stylesheet" type="text/css" href="<?php echo$this->Url->build('/', false); ?>css/lightbox/magnific-popup.css"> 
 <script src="<?php echo$this->Url->build('/', false); ?>js/lightbox/jquery.magnific-popup.js"></script>

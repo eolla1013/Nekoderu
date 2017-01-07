@@ -460,7 +460,7 @@ class CatsController extends AppController
                 $data = $this->request->data;
                 if(is_uploaded_file($data["image"]["tmp_name"])){
                     $file = $data["image"];
-                    $catImage = $this->saveCatImage($file, $cat_id, $uid);
+                    $catImage = $this->saveCatImage($file["tmp_name"], $cat_id, $uid);
                     
                     $response = $catImage;
                 }
@@ -494,7 +494,7 @@ class CatsController extends AppController
                     if(is_uploaded_file($data["image"][$i]["tmp_name"])){
                         // アップロード処理
                         $file = $data["image"][$i];
-                        $catImage = $this->saveCatImage($file, $cat_id, $uid);
+                        $catImage = $this->saveCatImage($file["tmp_name"], $cat_id, $uid);
                         $commentAdd[] = $catImage->thumbnail;
                     }
                 }
