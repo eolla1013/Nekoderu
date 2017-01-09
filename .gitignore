@@ -8,3 +8,7 @@
 !.elasticbeanstalk/*.global.yml
 
 keys
+*.suo
+lambda/.vs/
+lambda/NekoderuScrapingBatch/bin/
+lambda/NekoderuScrapingBatch/obj/
