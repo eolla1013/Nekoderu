@@ -13,16 +13,36 @@ namespace NekoderuScrapingBatch
 {
     public class Function
     {
-        
+        private ILambdaContext Context;
+
         /// <summary>
-        /// A simple function that takes a string and does a ToUpper
+        /// Nekoderuスクレイピング用のLambdaエントリポイント
         /// </summary>
-        /// <param name="input"></param>
-        /// <param name="context"></param>
+        /// <param name="input">CloudWatchのスケジュールイベント引数</param>
+        /// <param name="context">Lambdaの実行コンテキスト</param>
         /// <returns></returns>
-        public string FunctionHandler(string input, ILambdaContext context)
+        public NekoderuScrapingBatch.NekoData FunctionHandler(Object input, ILambdaContext context)
         {
-            return input?.ToUpper();
+            context.Logger.LogLine("NekoderuBatch実行開始！");
+
+            this.Context = context;
+            NekoderuScrapingBatch model = new NekoderuScrapingBatch(context);
+            NekoderuScrapingBatch.NekoData ret = null;
+            try {
+                Newtonsoft.Json.Linq.JObject obj = (Newtonsoft.Json.Linq.JObject)input;
+                DateTime stddt = obj.Value<DateTime>("time");
+
+                context.Logger.LogLine("実行日:" + stddt.ToString("yyyy/MM/dd"));
+
+                ret = model.RunMaigoNekoFromKumamotoAnimalCenter(stddt);
+                model.SendMaigoNekoInfo(ret);
+            } catch (Exception ex) {
+                context.Logger.LogLine("NekoderuBatch実行中にエラー発生！");
+                context.Logger.LogLine(ex.ToString());
+            }
+
+            context.Logger.LogLine("NekoderuBatch実行終了！");
+            return ret;
         }
     }
 }
