@@ -9,7 +9,6 @@
 
 keys
 *.suo
-.gitattributes
 lambda/.vs/
 lambda/NekoderuScrapingBatch/bin/
 lambda/NekoderuScrapingBatch/obj/
