@@ -144,7 +144,7 @@ class NekoUtilComponent extends Component {
      *
      * @return string
      */
-    function saveGif($orgFilePath, $exportFilePath) {
+    function saveGif($orgFilePath, $exportFilePath, $start = 0, $end = 0) {
         // 書き出しファイル名を生成
         $outputFilePath = $exportFilePath . "/" . $this->generateUniqueFileName(".gif");
 
@@ -158,7 +158,9 @@ class NekoUtilComponent extends Component {
             unlink($outputFilePath); 
         }
         // $cmd  = "ffmpeg -i $in -ar 22050 -acodec libmp3lame -ab 32K -r 25 -s 320x240 -vcodec gif $outputFilePath";
-        $cmd  = "ffmpeg -i $orgFilePath -vf 'scale=480:-1' $outputFilePath";
+        $t = $end - $start;
+        $ss = $start;
+        $cmd  = "ffmpeg -i $orgFilePath -t $t -ss $ss -vf 'scale=480:-1' $outputFilePath";
         
         exec(escapeshellcmd($cmd));
         unlink($orgFilePath);

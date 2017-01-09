@@ -83,7 +83,7 @@ class CatsCommonComponent extends Component {
             
             if (isset($data['file'])){
                 $file = $data['file'];
-                $savePath = $this->NekoUtil->saveGif($file["tmp_name"], TMP);
+                $savePath = $this->NekoUtil->saveGif($file["tmp_name"], TMP, $data['begin'], $data['end']);
                 $this->saveCatMovie($savePath, $cat->id, $uid, false);
             }
                 
