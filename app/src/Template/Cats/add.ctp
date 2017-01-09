@@ -58,15 +58,19 @@
 ?>
     <div class="box">
         <div class="memo-title">
-            １．<a href="#" id="photo">写真</a> or <a href="#" id="movie">動画</a> を選ぶ <sup class="required">※必須</sup>
-            <div id="multi-image-selector">
-                <?= $this->element('partial/multi_image_selector'); ?>
-            </div>
-            <div id="movie-selector">
-                <?= $this->element('partial/movie_selector'); ?>
+            <div>
+            １．<a class="btn btn-default btn-sm" href="#" id="photo"><span style="padding-right: 4px;" class="glyphicon glyphicon-camera" aria-hidden="true"></span>写真</a>
+                 または 
+                <a  class="btn btn-default btn-sm" href="#" id="movie"><span style="padding-right: 4px;" class="glyphicon glyphicon-film" aria-hidden="true"></span>動画</a>
+                を選ぶ <sup class="required">※必須</sup>
             </div>
             <div id="selector-form">
-                
+                 <div id="multi-image-selector">
+                    <?= $this->element('partial/multi_image_selector'); ?>
+                </div>
+                <div id="movie-selector">
+                    <?= $this->element('partial/movie_selector'); ?>
+                </div>
             </div>
         </div>
     </div>
@@ -226,6 +230,10 @@ form#changeRegionStdForm input[type=radio].locRad {
 
 .required{
     color:red;
+}
+
+#selector-form {
+    margin-top: 20px;
 }
 </style>
 
