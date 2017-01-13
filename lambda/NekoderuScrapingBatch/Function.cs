@@ -35,7 +35,11 @@ namespace NekoderuScrapingBatch
                 context.Logger.LogLine("実行日:" + stddt.ToString("yyyy/MM/dd"));
 
                 ret = model.RunMaigoNekoFromKumamotoAnimalCenter(stddt);
-                model.SendMaigoNekoInfo(ret);
+                if (ret.NekoList.Count > 0) {
+                    model.SendMaigoNekoInfo(ret);
+                } else {
+                    context.Logger.LogLine("登録データなし");
+                }
             } catch (Exception ex) {
                 context.Logger.LogLine("NekoderuBatch実行中にエラー発生！");
                 context.Logger.LogLine(ex.ToString());

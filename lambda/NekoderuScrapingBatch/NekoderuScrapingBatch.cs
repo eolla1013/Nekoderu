@@ -37,6 +37,8 @@ namespace NekoderuScrapingBatch
                     XmlNodeList headnodes = doc.SelectNodes(@"//div[@class='txtcolumn']");
 
                     neko.Title = string.Format("熊本市動物愛護センターで{0:yyyy年MM月dd日}に保護された猫です。", stddt);
+                    neko.PageUrl = response.Result.RequestMessage.RequestUri.ToString();
+
                     Context.Logger.LogLine(neko.Title);
                     foreach (XmlNode headnode in headnodes) {
                         try {
@@ -106,14 +108,14 @@ namespace NekoderuScrapingBatch
                 var tknres = tknresmsg.Result;
                 Context.Logger.LogLine(tknres.StatusCode +":"+tknres.ReasonPhrase);
                 string strres = tknres.Content.ReadAsStringAsync().Result;
-                Context.Logger.LogLine(strres);
+                //Context.Logger.LogLine(strres);
                 Newtonsoft.Json.Linq.JObject obj = (Newtonsoft.Json.Linq.JObject)JsonConvert.DeserializeObject(strres);
                 if ((bool)obj["success"]) {
                     token = (string)(obj["data"]["token"]);
                 }
             }
             if (token == "") {
-                Context.Logger.LogLine("トークンが取得できなかった。");
+                Context.Logger.LogLine("登録エラー！トークンが取得できなかった。");
                 return;
             }
 
@@ -123,7 +125,7 @@ namespace NekoderuScrapingBatch
                 reqcont.Add(new StringContent(token), "token");
                 reqcont.Add(new StringContent(""), "locate");
                 reqcont.Add(new StringContent(itm.ShelterPlace), "address");
-                reqcont.Add(new StringContent(itm.Content + itm.RangeText), "comment"); //TODO 元ページのURLがいる？コメント複数設定できたっけ？
+                reqcont.Add(new StringContent(itm.Content + itm.RangeText + " " + neko.PageUrl), "comment");
                 reqcont.Add(new StringContent(neko.Title), "name");
                 reqcont.Add(new ByteArrayContent(itm.ImageData), "image[]", itm.ImageUrl);
                 Context.Logger.LogLine("Content Count:" + reqcont.Count());
@@ -142,6 +144,7 @@ namespace NekoderuScrapingBatch
         public class NekoData
         {
             public string Title { get; set; }
+            public string PageUrl { get; set; }
             public List<NekoItem> NekoList { get; set; }
 
             public NekoData() {
