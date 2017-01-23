@@ -39,7 +39,7 @@
     <?php if($catImage->catImageAnalyses): ?>
         <div class="row">
             <h4><?= __('Analysis') ?></h4>
-            <pre><?= $catImage->catImageAnalyses[0]->data ?>" width="200px"></pre>
+            <pre><?= $catImage->catImageAnalyses[0]->data ?></pre>
         </div>
     <?php endif; ?>
     <div class="row">
