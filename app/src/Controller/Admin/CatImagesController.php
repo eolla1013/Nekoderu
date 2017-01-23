@@ -11,7 +11,7 @@ use Cake\Event\Event;
 class CatImagesController extends AppController
 {
     
-    public $components = ['NekoUtil'];
+    public $components = array('NekoUtil', 'GoogleApi');
     
     /**
      * Index method
@@ -39,8 +39,20 @@ class CatImagesController extends AppController
     public function view($id = null)
     {
         $catImage = $this->CatImages->get($id, [
-            'contain' => ['Cats']
+            'contain' => ['Cats', 'CatImageAnalyses']
         ]);
+        
+        if($catImage->catImageAnalyses == null){
+            $json = $this->GoogleApi->detectObjects($catImage->url);
+            $cia = $this->CatImages->CatImageAnalyses->newEntity();
+            
+            $cia->catImage_id = $catImage->id;
+            $cia->analyzer = "vision.googleapis.com/v1/images:annotate";
+            $cia->data = $json;
+            if($this->CatImages->CatImageAnalyses->save($cia)){
+                $catImage->catImageAnalyses = [$cia];
+            }
+        }
 
         $this->set('catImage', $catImage);
         $this->set('_serialize', ['catImage']);

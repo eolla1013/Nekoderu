@@ -34,6 +34,15 @@
         </tr>
     </table>
     <div class="row">
+        <img src="<?= $catImage->url ?>" width="200px"></img>
+    </div>
+    <?php if($catImage->catImageAnalyses): ?>
+        <div class="row">
+            <h4><?= __('Analysis') ?></h4>
+            <pre><?= $catImage->catImageAnalyses[0]->data ?>" width="200px"></pre>
+        </div>
+    <?php endif; ?>
+    <div class="row">
         <h4><?= __('Url') ?></h4>
         <?= $this->Text->autoParagraph(h($catImage->url)); ?>
     </div>
