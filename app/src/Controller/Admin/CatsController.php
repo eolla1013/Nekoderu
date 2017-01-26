@@ -39,11 +39,17 @@ class CatsController extends AppController
     
     public function map()
     {
-
-        $now = time();
-        $from_time = 1460559600;
-
-        $this->set(compact('now', 'from_time'));
+        
+        $cats = $this->Cats->find('all')
+            //->contain(['CatImages', 'Comments', 'Users', 'ResponseStatuses', 'CatImages.CatImageAnalyses']);
+            ->contain(['CatImages', 'Users', 'CatImages.CatImageAnalyses'])->limit(1000)->toArray();
+            
+        foreach($cats as $cat){
+            $cat->hiddenProperties([]);
+        }
+            
+        $this->set(compact('cats'));
+        $this->set('_serialize', ['cats']);
     }
     
      /**
