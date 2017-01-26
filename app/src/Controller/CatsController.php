@@ -104,7 +104,7 @@ class CatsController extends AppController
     {
         $this->CatImages = TableRegistry::get("CatImages");
         $images = $this->CatImages->find('all')
-            ->contain(['Cats'])
+            ->contain(['Cats', 'CatImageAnalyses'])
             ->where([
                 'Cats.hidden =' => 0
             ])
@@ -150,7 +150,7 @@ class CatsController extends AppController
         
         $cat = $this->Cats->get($id, [
             'contain' => [
-                'CatImages', 
+                'CatImages', 'CatImages.CatImageAnalyses',
                 'Comments'=> function ($q) {
                     return $q->order(['Comments.created' => 'DESC']);
                 },  
@@ -163,7 +163,6 @@ class CatsController extends AppController
                 'Eyewitnesses.EyewitnessImages'
             ]
         ]);
-        
         
         if($cat->hidden){
             return $this->redirect('/');

@@ -102,16 +102,38 @@
         <div class="gutter-sizer"></div>
         <?php foreach ($images as $image): ?>
             <?php $cat = $image->cat; ?>
-                <?php if(rand(0,15) < 0): ?>
-                    <div class="grid-item grid-item--width2">
-                <?php else: ?>
-                    <div class="grid-item">
-                <?php endif; ?>
-                <?php if($image->thumbnail):?>
-                    <div><a title="<a class='more' href='/cats/view/<?=$cat->id ?>'>詳しく見る</a>" class='gallery' href="<?= $image->url ?>"><img src="<?= $image->thumbnail ?>" width="100%"></img></a></div>
-                <?php else: ?>
-                    <div><a title="<a class='more' href='/cats/view/<?=$cat->id ?>'>詳しく見る</a>" class='gallery' href="<?= $image->url ?>"><img src="<?= $image->url ?>" width="100%"></img></a></div>
-                <?php endif; ?>
+            <?php if(rand(0,15) < 0): ?>
+                <div class="grid-item grid-item--width2">
+            <?php else: ?>
+                <div class="grid-item">
+            <?php endif; ?>
+                    <div>
+                    <?php if($image->thumbnail):?>
+                        <div><a title="<a class='more' href='/cats/view/<?=$cat->id ?>'>詳しく見る</a>" class='gallery' href="<?= $image->url ?>"><img src="<?= $image->thumbnail ?>" width="100%"></img></a></div>
+                    <?php else: ?>
+                        <div><a title="<a class='more' href='/cats/view/<?=$cat->id ?>'>詳しく見る</a>" class='gallery' href="<?= $image->url ?>"><img src="<?= $image->url ?>" width="100%"></img></a></div>
+                    <?php endif; ?>
+                    </div>
+                    <!-- 画像解析結果 (管理者、投稿者本人か情報提供者の場合のみ)-->
+                    <?php if($auth && $auth['is_superuser']): ?>
+                    <div class="analysis">
+                        <h6><a href="#">画像解析結果</a></h6>
+                        <ul>
+                            <?php 
+                                $result = json_decode($image->cat_image_analyses[0]);
+                                $data = json_decode($result->data);
+                                $labels = $data->responses[0]->labelAnnotations;
+                                foreach($labels as $label){
+                                    // debug($label);
+                                    $val = "".$label->description." (".$label->score.")"; 
+                            ?>
+                                    <li><?= $val ?></li>
+                            <?php
+                                }
+                            ?> 
+                        </ul>
+                    </div>
+                    <?php endif; ?>
             </div>
         <?php endforeach; ?>
     </div>
@@ -145,10 +167,13 @@
 <?php endif; ?>
 
 <script type="text/javascript">
-
-    
 $(function(){
-
+    $(".analysis ul").hide();
+    $(".analysis a").click(function(){
+        $(".analysis ul").toggle();
+        $('.grid').masonry();
+    });
+    
     function encourage_popup(e){
         <?php if (!$auth): ?>
             e.preventDefault();
@@ -255,7 +280,7 @@ $(function(){
 		var $newElems = $( newElements );
 // 		console.log($newElems);
 		$newElems.imagesLoaded(function(){
-		    $container.masonry( 'appended', $newElems, true ); 
+		    $container.masonry('appended', $newElems, true ); 
 		    initialize();
 		});
 	});

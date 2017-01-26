@@ -27,10 +27,6 @@ class CatShell extends Shell
         $catImages = $this->CatImages->find()->contain(['CatImageAnalyses']);
         
         foreach($catImages as $catImage){
-            // debug($catImage);
-            // debug($catImage->url);
-            // debug($catImage->cat_image_analyses);
-            // exit;
             
             if(count($catImage->cat_image_analyses) <= 0){
                 $json = $this->GoogleApi->detectObjects($catImage->url);

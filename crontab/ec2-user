@@ -4,3 +4,4 @@ MAILTO=ec2-user
 HOME=/
 
 */30 * * * * ec2-user /var/app/current/app/bin/cake cat set_location
+*/30 * * * * ec2-user /var/app/current/app/bin/cake cat set_image_analysis
