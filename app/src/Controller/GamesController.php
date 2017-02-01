@@ -59,7 +59,8 @@ class GamesController extends AppController
     
         $this->CatImages = TableRegistry::get('CatImages');
     
-        $images = $this->CatImages->find('all')
+        $images = $this->CatImages->find('all')->contain('Cats')
+        ->where(['Cats.hidden' => 0])
         ->order('rand()')
         ->limit(2);
     
