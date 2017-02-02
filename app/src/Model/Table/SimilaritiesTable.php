@@ -46,6 +46,11 @@ class SimilaritiesTable extends Table
             'foreignKey' => 'image2_id',
             'joinType' => 'INNER'
         ]);
+        
+        $this->belongsTo('Users', [
+            'foreignKey' => 'user_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**

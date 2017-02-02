@@ -32,6 +32,9 @@ class MyUsersTable extends UsersTable
         $this->hasOne('Avatars', [
             'foreignKey' => 'users_id'
         ]);
+        $this->hasMany('Similarities', [
+            'foreignKey' => 'user_id'
+        ]);
     }
     
      // In a table class

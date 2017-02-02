@@ -29,9 +29,9 @@ class GamesController extends AppController
         if($this->Auth->user()){
             $this->Auth->allow();
         }
-        // else{
-        //     $this->Auth->allow(['add', 'add2', 'view', 'data', 'grid', 'tag', 'photoGrid', 'comments', 'readNotification']);    
-        // }
+        else{
+            $this->Auth->allow(['similarity']);    
+        }
     }
     
     public function isAuthorized($user)
@@ -50,7 +50,13 @@ class GamesController extends AppController
         $similarity = $this->Similarities->newEntity();
        
         if ($this->request->is('post')) {
+            
             $similarity = $this->Similarities->patchEntity($similarity, $this->request->data);
+            
+            $user = $this->Auth->user();
+            if($user){
+                $similarity->user_id = $user['id'];
+            }
             if ($this->Similarities->save($similarity)) {
             } else {
                 $this->Flash->error(__('The answer could not be saved. Please, try again.'));
