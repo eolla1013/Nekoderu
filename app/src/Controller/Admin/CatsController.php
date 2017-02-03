@@ -7,7 +7,13 @@ use Cake\Event\Event;
 
 class CatsController extends AppController
 {
-    public $components = array('NekoUtil');
+    
+    public $paginate = [
+        // その他のキーはこちら
+        'maxLimit' => 20
+    ];
+    
+    public $components = ['RequestHandler', 'CatsCommon', 'NekoUtil', 'NotificationManager'];
     
     private function putOptions(){
         $statuses = $this->Cats->ResponseStatuses->find('list', [
@@ -33,6 +39,28 @@ class CatsController extends AppController
             
         $cats = $this->paginate($data);
         
+        $this->set(compact('cats'));
+        $this->set('_serialize', ['cats']);
+    }
+    
+    /**
+     * Grid method
+     *
+     * @return \Cake\Network\Response|null
+     */
+    public function grid()
+    {
+        
+        $q = $this->request->query;
+        if(array_key_exists('order', $q)){
+            $order = $q['order'];
+        }else{
+            $order = null;
+        }
+        
+        $data = $this->CatsCommon->listCats(null, $order, true);
+        $cats = $this->paginate($data);
+       
         $this->set(compact('cats'));
         $this->set('_serialize', ['cats']);
     }

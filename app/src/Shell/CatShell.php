@@ -22,6 +22,16 @@ class CatShell extends Shell
         $this->out('Hello world.');
     }
     
+    // bin/cake cat input_tnr_data_from_google_drive 1Fe51bs5nsHACjgLtkl6PI5sXKanfuwA9dZ-DWkZhyCI 0By-brejWDbtQLWNqRUxVYlVPRzA 100
+    public function inputTNRDataFromGoogleDrive($sheetId, $folderId, $maxnum){
+        debug($sheetId);
+        debug($folderId);
+        debug(intval($maxnum));
+        $this->GoogleApi->inputTNRDataFromGoogleDrive(
+            $sheetId, $folderId, $this, $maxnum
+        );
+    }
+    
     public function setImageAnalysis(){
      
         $catImages = $this->CatImages->find()->contain(['CatImageAnalyses']);

@@ -28,8 +28,7 @@ class GamesController extends AppController
         //TODO: きっとやり方違う
         if($this->Auth->user()){
             $this->Auth->allow();
-        }
-        else{
+        }else{
             $this->Auth->allow(['similarity']);    
         }
     }

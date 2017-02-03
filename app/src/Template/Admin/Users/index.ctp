@@ -14,14 +14,14 @@
                 <th scope="col"><?= $this->Paginator->sort('id') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('username') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('email') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('password') ?></th>
+                <!--<th scope="col"><?= $this->Paginator->sort('password') ?></th>-->
                 <th scope="col"><?= $this->Paginator->sort('first_name') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('last_name') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('token') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('token_expires') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('api_token') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('activation_date') ?></th>
-                <th scope="col"><?= $this->Paginator->sort('tos_date') ?></th>
+                <!--<th scope="col"><?= $this->Paginator->sort('token') ?></th>-->
+                <!--<th scope="col"><?= $this->Paginator->sort('token_expires') ?></th>-->
+                <!--<th scope="col"><?= $this->Paginator->sort('api_token') ?></th>-->
+                <!--<th scope="col"><?= $this->Paginator->sort('activation_date') ?></th>-->
+                <!--<th scope="col"><?= $this->Paginator->sort('tos_date') ?></th>-->
                 <th scope="col"><?= $this->Paginator->sort('active') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('is_superuser') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('role') ?></th>
@@ -36,14 +36,14 @@
                 <td><?= h($user->id) ?></td>
                 <td><?= h($user->username) ?></td>
                 <td><?= h($user->email) ?></td>
-                <td><?= h($user->password) ?></td>
+                <!--<td><?= h($user->password) ?></td>-->
                 <td><?= h($user->first_name) ?></td>
                 <td><?= h($user->last_name) ?></td>
-                <td><?= h($user->token) ?></td>
-                <td><?= h($user->token_expires) ?></td>
-                <td><?= h($user->api_token) ?></td>
-                <td><?= h($user->activation_date) ?></td>
-                <td><?= h($user->tos_date) ?></td>
+                <!--<td><?= h($user->token) ?></td>-->
+                <!--<td><?= h($user->token_expires) ?></td>-->
+                <!--<td><?= h($user->api_token) ?></td>-->
+                <!--<td><?= h($user->activation_date) ?></td>-->
+                <!--<td><?= h($user->tos_date) ?></td>-->
                 <td><?= h($user->active) ?></td>
                 <td><?= h($user->is_superuser) ?></td>
                 <td><?= h($user->role) ?></td>

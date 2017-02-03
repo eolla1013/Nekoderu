@@ -63,7 +63,7 @@ class NekoUtilComponent extends Component {
         $ext = $this->extension($file);
         $srcPath = $file;
 
-        $timestamp = uniqid();
+        $timestamp = sha1( uniqid( mt_rand() , true ) );
         $name = $timestamp . "_file." . $ext;
         
         $s3 = new S3Client([

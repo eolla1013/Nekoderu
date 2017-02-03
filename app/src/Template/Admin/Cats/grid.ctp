@@ -1,0 +1,1 @@
+<?= $this->element('partial/cats_grid'); ?>
