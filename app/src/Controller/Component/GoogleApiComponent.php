@@ -8,8 +8,9 @@ use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 
 define('APPLICATION_NAME', 'Drive API PHP Quickstart');
-define('CREDENTIALS_PATH', '~/.credentials/auth_token.json');
-define('REFRESH_TOKEN_PATH', '~/.credentials/refresh_token.json');
+define('CREDENTIAL_DIR', '~/.credentials/');
+define('CREDENTIALS_PATH', CREDENTIAL_DIR.'auth_token.json');
+define('REFRESH_TOKEN_PATH', CREDENTIAL_DIR.'refresh_token.json');
 define('TMP_DIR', '~/workspace/app/tmp/');
 
 /**
@@ -20,6 +21,15 @@ define('CLIENT_SECRET_PATH', '~/.credentials/client_secret.json');
 class GoogleApiComponent extends Component {
    
     public $components = ['NotificationManager', 'NekoUtil', 'CatsCommon'];
+    
+    public function initialize(array $config) {
+        if(!file_exists($this->NekoUtil->expandHomeDirectory(CREDENTIAL_DIR))){
+            mkdir($this->NekoUtil->expandHomeDirectory(CREDENTIAL_DIR), 0755, true);
+        }
+        if(!file_exists($this->NekoUtil->expandHomeDirectory(TMP_DIR))){
+            mkdir($this->NekoUtil->expandHomeDirectory(TMP_DIR), 0755, true);
+        }
+    }
    
      /**
      * Returns an authorized API client.
@@ -37,7 +47,7 @@ class GoogleApiComponent extends Component {
         $client->addScope(\Google_Service_Sheets::SPREADSHEETS);
         
         if(isset($_SERVER['HTTP_HOST'])){
-            $client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/tests/oauth2callback');
+            $client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/admin/tests/oauth2callback');
         }
         $client->setApprovalPrompt("force");
         $client->setAccessType("offline");
@@ -49,14 +59,12 @@ class GoogleApiComponent extends Component {
          // Load previously authorized credentials from a file.
         $credentialsPath = $this->NekoUtil->expandHomeDirectory(CREDENTIALS_PATH);
         
-        // print_r($credentialsPath);
-        // exit;
-        
         if (file_exists($credentialsPath)) {
             $accessToken = file_get_contents($credentialsPath);
         } else {
             // Request authorization from the user.
             $auth_url = $client->createAuthUrl();
+            debug($auth_url);
             return $this->_registry->getController()->redirect(filter_var($auth_url, FILTER_SANITIZE_URL));
         }
         $client->setAccessToken($accessToken);
@@ -93,8 +101,8 @@ class GoogleApiComponent extends Component {
         // $google_token= json_decode($accessToken);
         // $refreshToken  = $google_token->refresh_token;
 
-        $credentialsPath = $this->expandHomeDirectory(CREDENTIALS_PATH);
-        $refreshTokenPath = $this->expandHomeDirectory(REFRESH_TOKEN_PATH);
+        $credentialsPath = $this->NekoUtil->expandHomeDirectory(CREDENTIALS_PATH);
+        $refreshTokenPath = $this->NekoUtil->expandHomeDirectory(REFRESH_TOKEN_PATH);
         // Store the credentials to disk.
         if(!file_exists(dirname($credentialsPath))) {
           mkdir(dirname($credentialsPath), 0700, true);

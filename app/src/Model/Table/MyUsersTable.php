@@ -2,6 +2,7 @@
 namespace App\Model\Table;
 
 use CakeDC\Users\Model\Table\UsersTable;
+use Cake\ORM\RulesChecker;
 
 /**
  * Users Model
