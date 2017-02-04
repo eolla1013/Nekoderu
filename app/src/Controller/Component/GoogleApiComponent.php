@@ -170,7 +170,7 @@ class GoogleApiComponent extends Component {
         return $r;
     }
     
-    function inputTNRDataFromGoogleDrive($spreadsheetId, $photoFolder, $shell, $maxnum_at_once = 1) {
+    function inputTNRDataFromGoogleDrive($spreadsheetId, $photoFolder, $maxnum_at_once = 1) {
         
         $this->Cats = TableRegistry::get('Cats');
         $this->CatImages = TableRegistry::get('CatImages');

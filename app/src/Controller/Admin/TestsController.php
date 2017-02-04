@@ -69,8 +69,6 @@ class TestsController extends AppController
         $this->GoogleApi->oauth2callback();
     }
     
-    
-    
     public function mail(){
         $email = new Email();
         $res = $email->template('default')

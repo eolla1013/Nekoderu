@@ -28,7 +28,7 @@ class CatShell extends Shell
         debug($folderId);
         debug(intval($maxnum));
         $this->GoogleApi->inputTNRDataFromGoogleDrive(
-            $sheetId, $folderId, $this, $maxnum
+            $sheetId, $folderId, $maxnum
         );
     }
     
