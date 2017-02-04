@@ -8,10 +8,10 @@ use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 
 define('APPLICATION_NAME', 'Drive API PHP Quickstart');
-define('CREDENTIAL_DIR', '~/.credentials/');
+define('CREDENTIAL_DIR', env("DATA_DIR").'.credentials/');
 define('CREDENTIALS_PATH', CREDENTIAL_DIR.'auth_token.json');
 define('REFRESH_TOKEN_PATH', CREDENTIAL_DIR.'refresh_token.json');
-define('TMP_DIR', '~/workspace/app/tmp/');
+define('TMP_DIR', env("DATA_DIR").'workspace/app/tmp/');
 
 /**
  * You need to get a credeintial file from Google Dev Console
@@ -29,6 +29,9 @@ class GoogleApiComponent extends Component {
         if(!file_exists($this->NekoUtil->expandHomeDirectory(TMP_DIR))){
             mkdir($this->NekoUtil->expandHomeDirectory(TMP_DIR), 0755, true);
         }
+        // debug($this->NekoUtil->expandHomeDirectory(CREDENTIAL_DIR));
+        // debug($this->NekoUtil->expandHomeDirectory(TMP_DIR));
+        // exit;
     }
    
      /**

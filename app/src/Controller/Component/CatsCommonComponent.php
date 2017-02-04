@@ -5,6 +5,7 @@ use Cake\Controller\Component;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
+use Cake\Log\Log;
 
 class CatsCommonComponent extends Component {
     
@@ -117,7 +118,9 @@ class CatsCommonComponent extends Component {
             //サムネイルを作成
             $savePath = $this->NekoUtil->createThumbnail($file, TMP);
             if ($savePath === "") {
-                die("不正な画像がuploadされました");
+                Log::error("不正な画像がuploadされました");
+                // die("不正な画像がuploadされました");
+                return;
             }
             $thumbnail = $this->NekoUtil->s3Upload($savePath, '');
             // 書きだした画像を削除
@@ -153,7 +156,8 @@ class CatsCommonComponent extends Component {
         
         $savePath = $this->NekoUtil->safeImage($file, TMP);
         if ($savePath === "") {
-            die("不正な画像がuploadされました");
+            Log::error("不正な動画がuploadされました");
+            // die("不正な画像がuploadされました");
         }
         return $this->saveImageOnAWS($savePath, $cat_id, $uid, true);
     }

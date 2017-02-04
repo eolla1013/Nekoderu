@@ -101,7 +101,13 @@ class NekoUtilComponent extends Component {
       if (empty($homeDirectory)) {
         $homeDirectory = getenv("HOMEDRIVE") . getenv("HOMEPATH");
       }
-      return str_replace('~', realpath($homeDirectory), $path);
+      $path = str_replace('~', realpath($homeDirectory), $path);
+      
+      if(substr($path,  0, strlen("/")) === "/"){
+        return $path;
+      }else{
+          return WWW_ROOT.$path;
+      }
     }
     
     /**
