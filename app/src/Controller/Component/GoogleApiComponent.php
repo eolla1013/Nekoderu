@@ -244,6 +244,9 @@ class GoogleApiComponent extends Component {
                         'pageSize' => '1'];
                     
                     $list = $this->Drive->files->listFiles($parameters);
+                    if(count($list->getFiles())<=0){
+                        continue;
+                    }
                     $folderId = $list->getFiles()[0]['id'];
                     
                     $parameters = [
