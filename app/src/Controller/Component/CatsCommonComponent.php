@@ -4,6 +4,7 @@ namespace App\Controller\Component;
 use Cake\Controller\Component;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
+use Cake\Routing\Router;
 
 class CatsCommonComponent extends Component {
     
