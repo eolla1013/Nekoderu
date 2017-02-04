@@ -14,6 +14,11 @@
 
 
 - migrationの実行
+    - bin/cake migrations migrate
+    - bin/cake migrations migrate -p CakeDC/Users 
+        - [CakeDC Users](https://github.com/CakeDC/users)
+
+
 
 
 - sudo apt-get update
@@ -22,9 +27,9 @@
 - sudo apt-get install imagemagick php5-imagick
 - sudo apt-get install ffmpeg
 # ubuntu 14.04の場合
-sudo add-apt-repository -y ppa:mc3man/trusty-media
-sudo apt-get update
-sudo apt-get dist-upgrade
+- sudo add-apt-repository -y ppa:mc3man/trusty-media
+- sudo apt-get update
+- sudo apt-get dist-upgrade
 
 
 - phpmyadmin-ctl install
