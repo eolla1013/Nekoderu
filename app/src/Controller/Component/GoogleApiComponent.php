@@ -12,10 +12,6 @@ define('CREDENTIAL_DIR', env("DATA_DIR").'.credentials/');
 define('AUTH_TOKEN_PATH', CREDENTIAL_DIR.'auth_token.json');
 define('REFRESH_TOKEN_PATH', CREDENTIAL_DIR.'refresh_token.json');
 define('TMP_DIR', env("DATA_DIR").'workspace/app/tmp/');
-
-/**
- * You need to get a credeintial file from Google Dev Console
- */
 define('CLIENT_SECRET_PATH', CREDENTIAL_DIR.'client_secret.json');
 
 class GoogleApiComponent extends Component {
@@ -83,9 +79,16 @@ class GoogleApiComponent extends Component {
         return $client;
     }
     
+    
+    function connectGoogle($secret){
+        file_put_contents(CLIENT_SECRET_PATH, $secret);
+        $this->getClient();
+        return $this->_registry->getController()->redirect('/admin/functions');
+    }
+    
     function googleConnect(){
         $this->getClient();
-        return $this->_registry->getController()->redirect('/');
+        return $this->_registry->getController()->redirect('/admin/functions');
     }
     
     function googleRevoke(){
@@ -114,7 +117,7 @@ class GoogleApiComponent extends Component {
         file_put_contents($refreshTokenPath, $refreshToken);
         debug("Credentials saved to ". $credentialsPath);
         
-        return $this->_registry->getController()->redirect('/');
+        return $this->_registry->getController()->redirect('/admin/functions');
     }
     
     function detectObjects($image_path){
@@ -175,6 +178,8 @@ class GoogleApiComponent extends Component {
     
     function inputTNRDataFromGoogleDrive($spreadsheetId, $photoFolder, $maxnum_at_once = 1) {
         
+        ob_implicit_flush(true);
+        
         $this->Cats = TableRegistry::get('Cats');
         $this->CatImages = TableRegistry::get('CatImages');
         
@@ -226,11 +231,13 @@ class GoogleApiComponent extends Component {
                     }
                 }
                 
-                //写真の取得と保存
-                $client = $this->getClient();
-                $this->Drive = new \Google_Service_Drive($client);
-                
                 try {
+                        $this->Drive = null;
+                        unset($this->Drive);
+                        //写真の取得と保存
+                        $client = $this->getClient();
+                        $this->Drive = new \Google_Service_Drive($client);
+                        
                     $parameters = [
                         'q' => " '{$photoFolder}' in parents and name = '".$d['number'] ."'", 
                         'fields' => 'files',
@@ -246,12 +253,7 @@ class GoogleApiComponent extends Component {
                     $photos = $this->Drive->files->listFiles($parameters);
                     
                     foreach($photos->getFiles() as $photo){
-                        
-                        $content = $this->Drive->files->get($photo['id'], array('alt' => 'media'));
-                        $path = $this->NekoUtil->expandHomeDirectory(TMP_DIR.$photo->getName());
-                        file_put_contents($path, $content->getBody());
-                        $this->CatsCommon->saveCatImage($path, $cat->id);
-                        @unlink($path);
+                       $this->savePhoto($photo, $cat);
                     }
                 }      
                 catch (Exception $e)
@@ -263,6 +265,25 @@ class GoogleApiComponent extends Component {
         }
         
         debug("Done");
+    }
+    
+    function savePhoto($photo, $cat){
+                        
+        $content = $this->Drive->files->get($photo['id'], ['alt' => 'media']);
+        $path = $this->NekoUtil->expandHomeDirectory(TMP_DIR.$photo->getName());
+        
+        file_put_contents($path, $content->getBody());
+        
+        $result = $this->CatsCommon->saveCatImage($path, $cat->id);
+        @unlink($path);
+        
+        $path = null;
+        unset($path);
+        $result = null;
+        unset($result);
+        $content = null;
+        unset($content);
+        
     }
     
     
@@ -298,6 +319,7 @@ class GoogleApiComponent extends Component {
         }
         
     }
+    
 
     
     function readDataFromTNRSpreadsheet($spreadsheetId) {

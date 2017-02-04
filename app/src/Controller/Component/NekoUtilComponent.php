@@ -60,6 +60,7 @@ class NekoUtilComponent extends Component {
     }
     
     function s3Upload($file, $s3Dir) {
+        
         $ext = $this->extension($file);
         $srcPath = $file;
 
@@ -83,7 +84,10 @@ class NekoUtilComponent extends Component {
                 'SourceFile' => $srcPath,
                 'ACL'          => 'public-read',
             ));
-
+            
+            $s3 = null;
+            unset($s3);
+            
             return $result;
         }catch (\RuntimeException $e){
             throw $e;

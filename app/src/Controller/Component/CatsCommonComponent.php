@@ -129,7 +129,7 @@ class CatsCommonComponent extends Component {
         
         // 書きだした画像を削除
         @unlink($file);
-
+        
         if ($result) {
             
             $catImage = $this->Cats->CatImages->newEntity();
@@ -142,10 +142,10 @@ class CatsCommonComponent extends Component {
             $catImage->users_id = $uid;
             $catImage->cats_id = $cat_id;
             if ($this->Cats->CatImages->save($catImage)) {
-                // $this->Flash->success('画像を保存しました。');
                 return $catImage;
             }
         }
+        
     }
     
     public function saveCatMovie($file, $cat_id, $uid=null, $thumbnailing = true){
@@ -159,6 +159,7 @@ class CatsCommonComponent extends Component {
             Log::error("不正な動画がuploadされました");
             // die("不正な画像がuploadされました");
         }
+        
         return $this->saveImageOnAWS($savePath, $cat_id, $uid, true);
     }
     
