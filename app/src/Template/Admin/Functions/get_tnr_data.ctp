@@ -1,5 +1,5 @@
 <?= $this->Form->create(null, [
-    'url' => ['action' => 'getTNRData']
+    'url' => ['action' => 'getTnrData']
     ]) ?>
 <fieldset>
 <?php
