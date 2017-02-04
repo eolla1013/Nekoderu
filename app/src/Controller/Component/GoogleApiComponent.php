@@ -16,7 +16,7 @@ define('TMP_DIR', env("DATA_DIR").'workspace/app/tmp/');
 /**
  * You need to get a credeintial file from Google Dev Console
  */
-define('CLIENT_SECRET_PATH', '~/.credentials/client_secret.json');
+define('CLIENT_SECRET_PATH', CREDENTIAL_DIR.'client_secret.json');
 
 class GoogleApiComponent extends Component {
    
