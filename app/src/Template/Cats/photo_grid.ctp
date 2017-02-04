@@ -118,6 +118,7 @@
                     <?php if($auth && $auth['is_superuser']): ?>
                     <div class="analysis">
                         <h6><a href="#">画像解析結果</a></h6>
+                        <?php if(count($image->cat_image_analyses) > 0): ?>
                         <ul>
                             <?php 
                                 $result = json_decode($image->cat_image_analyses[0]);
@@ -132,6 +133,7 @@
                                 }
                             ?> 
                         </ul>
+                        <?php endif; ?>
                     </div>
                     <?php endif; ?>
             </div>

@@ -9,7 +9,7 @@ use Cake\ORM\TableRegistry;
 
 define('APPLICATION_NAME', 'Drive API PHP Quickstart');
 define('CREDENTIAL_DIR', env("DATA_DIR").'.credentials/');
-define('CREDENTIALS_PATH', CREDENTIAL_DIR.'auth_token.json');
+define('AUTH_TOKEN_PATH', CREDENTIAL_DIR.'auth_token.json');
 define('REFRESH_TOKEN_PATH', CREDENTIAL_DIR.'refresh_token.json');
 define('TMP_DIR', env("DATA_DIR").'workspace/app/tmp/');
 
@@ -60,14 +60,14 @@ class GoogleApiComponent extends Component {
         }
         
          // Load previously authorized credentials from a file.
-        $credentialsPath = $this->NekoUtil->expandHomeDirectory(CREDENTIALS_PATH);
+        $credentialsPath = $this->NekoUtil->expandHomeDirectory(AUTH_TOKEN_PATH);
         
         if (file_exists($credentialsPath)) {
             $accessToken = file_get_contents($credentialsPath);
         } else {
             // Request authorization from the user.
             $auth_url = $client->createAuthUrl();
-            debug($auth_url);
+            // debug($auth_url);
             return $this->_registry->getController()->redirect(filter_var($auth_url, FILTER_SANITIZE_URL));
         }
         $client->setAccessToken($accessToken);
@@ -104,7 +104,7 @@ class GoogleApiComponent extends Component {
         // $google_token= json_decode($accessToken);
         // $refreshToken  = $google_token->refresh_token;
 
-        $credentialsPath = $this->NekoUtil->expandHomeDirectory(CREDENTIALS_PATH);
+        $credentialsPath = $this->NekoUtil->expandHomeDirectory(AUTH_TOKEN_PATH);
         $refreshTokenPath = $this->NekoUtil->expandHomeDirectory(REFRESH_TOKEN_PATH);
         // Store the credentials to disk.
         if(!file_exists(dirname($credentialsPath))) {
@@ -296,7 +296,6 @@ class GoogleApiComponent extends Component {
         	print $e->getMessage();
         	exit;
         }
-    
         
     }
 

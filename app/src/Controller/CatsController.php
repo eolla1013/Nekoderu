@@ -60,7 +60,6 @@ class CatsController extends AppController
             $order = null;
         }
         
-        
         $data = $this->CatsCommon->listCats(null, $order);
         $cats = $this->paginate($data);
         
