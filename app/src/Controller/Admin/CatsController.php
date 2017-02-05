@@ -4,6 +4,8 @@ namespace App\Controller\Admin;
 
 use Cake\Controller\Controller;
 use Cake\Event\Event;
+use Cake\ORM\Table;
+use Cake\ORM\TableRegistry;
 
 class CatsController extends AppController
 {
@@ -60,6 +62,28 @@ class CatsController extends AppController
         
         $data = $this->CatsCommon->listCats(null, $order, true);
         $cats = $this->paginate($data);
+        
+        foreach($cats as $cat){
+            
+            $this->Questions = TableRegistry::get('Questions');
+            $questions = $this->Questions->find('all');
+            foreach($questions as $question){
+                if($question->name === "name"){
+                    if($name == null){
+                        $cuid = $this->Cats->Notes->find('all')->where(['name' => "cuid", "cat_id" => $cat->id])->first()->value;
+                        
+                        if($cuid != null){
+                            $answer = $this->Cats->Answers->newEntity();
+                            $answer->cats_id = $cat->id;
+                            $answer->questions_id = $question->id;
+                            $answer->value = $cuid;
+                            if ($this->Cats->Answers->save($answer)) {
+                            }
+                        }
+                    }
+                }
+            }
+        }
        
         $this->set(compact('cats'));
         $this->set('_serialize', ['cats']);
