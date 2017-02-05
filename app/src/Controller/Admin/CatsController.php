@@ -63,28 +63,6 @@ class CatsController extends AppController
         $data = $this->CatsCommon->listCats(null, $order, true);
         $cats = $this->paginate($data);
         
-        foreach($cats as $cat){
-            
-            $this->Questions = TableRegistry::get('Questions');
-            $questions = $this->Questions->find('all');
-            foreach($questions as $question){
-                if($question->name === "name"){
-                    if($name == null){
-                        $cuid = $this->Cats->Notes->find('all')->where(['name' => "cuid", "cat_id" => $cat->id])->first()->value;
-                        
-                        if($cuid != null){
-                            $answer = $this->Cats->Answers->newEntity();
-                            $answer->cats_id = $cat->id;
-                            $answer->questions_id = $question->id;
-                            $answer->value = $cuid;
-                            if ($this->Cats->Answers->save($answer)) {
-                            }
-                        }
-                    }
-                }
-            }
-        }
-       
         $this->set(compact('cats'));
         $this->set('_serialize', ['cats']);
     }
@@ -141,8 +119,41 @@ class CatsController extends AppController
     public function view($id = null)
     {
         $cat = $this->Cats->get($id, [
-            'contain' => ['CatImages', 'Comments', 'Users', 'ResponseStatuses']
+            'contain' => ['CatImages', 'Comments', 'Users', 'ResponseStatuses', 'Notes', 'Answers', 'Answers.Questions']
         ]);
+        
+        //XXX:一時的な処理のためそのうち削除するべき
+        //---ここから
+        $this->Questions = TableRegistry::get('Questions');
+        $questions = $this->Questions->find('all');
+        foreach($questions as $question){
+            if($question->name === "name"){
+                $names = $this->Cats->Answers->find('all')->where(["questions_id" => $question->id, "cats_id"=>$cat->id]);
+                
+                if(count($names->toArray()) >= 2){
+                    foreach ($names as $name) {
+                        $this->Cats->Answers->delete($name);
+                    }
+                }
+                $name = $this->Cats->Answers->find('all')->where(["questions_id" => $question->id, "cats_id"=>$cat->id])->first();
+                if($name == null){
+                    $cuid = $this->Cats->Notes->find('all')->where(['name' => "cuid", "cat_id" => $cat->id])->first()->value;
+                    
+                    if($cuid != null){
+                        $answer = $this->Cats->Answers->newEntity();
+                        $answer->cats_id = $cat->id;
+                        $answer->questions_id = $question->id;
+                        $answer->value = $cuid;
+                        if ($this->Cats->Answers->save($answer)) {
+                        }
+                    }
+                }
+            }
+        }
+        $cat = $this->Cats->get($id, [
+            'contain' => ['CatImages', 'Comments', 'Users', 'ResponseStatuses', 'Notes', 'Answers', 'Answers.Questions']
+        ]);
+        //---ここまで
 
         $this->set('cat', $cat);
         $this->set('_serialize', ['cat']);
