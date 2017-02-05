@@ -218,6 +218,19 @@ class GoogleApiComponent extends Component {
                 if($this->Cats->save($cat, ['associated' => ['Tags']])){
                 }
                 
+                $this->Questions = TableRegistry::get('Questions');
+                $questions = $this->Questions->find('all');
+                foreach($questions as $question){
+                    if($question->name === "name"){
+                        $answer = $this->Cats->Answers->newEntity();
+                        $answer->cats_id = $cat->id;
+                        $answer->questions_id = $question->id;
+                        $answer->value = $cuid;
+                        if ($this->Cats->Answers->save($answer)) {
+                        }
+                    }
+                }
+                
                 //追加情報の保存
                 foreach($d as $key => $value){
                     if(strlen($value) > 0){
