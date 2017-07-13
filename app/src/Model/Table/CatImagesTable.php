@@ -46,6 +46,10 @@ class CatImagesTable extends Table
             'joinType' => 'INNER'
         ]);
         
+        $this->hasMany('CatImageAnalyses', [
+            'foreignKey' => 'catImage_id',
+        ]);
+        
     }
 
     /**

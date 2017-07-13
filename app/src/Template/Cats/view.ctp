@@ -123,13 +123,16 @@
             <div class="gutter-sizer"></div>
             <?php foreach ($cat->cat_images as $image): ?>
                 <div class="grid-item">
-                    <?php if($image->thumbnail):?>
-                        <a class='gallery' href="<?= $image->url ?>"><img src="<?= $image->thumbnail ?>"></img></a>
-                    <?php else: ?>
-                        <a class='gallery' href="<?= $image->url ?>"><img src="<?= $image->url ?>"></img></a>
-                    <?php endif; ?>
+                    <div>
+                        <?php if($image->thumbnail):?>
+                            <a class='gallery' href="<?= $image->url ?>"><img src="<?= $image->thumbnail ?>"></img></a>
+                        <?php else: ?>
+                            <a class='gallery' href="<?= $image->url ?>"><img src="<?= $image->url ?>"></img></a>
+                        <?php endif; ?>
+                    </div>
                 </div>
             <?php endforeach; ?>
+           
         </div>
     </div>
     <div class="row">
@@ -139,6 +142,8 @@
             <?php endforeach; ?>
         </ul>
     </div>
+    <!-- 画像解析結果 -->
+    
     
     <?php if($cat->flg === 1): ?>
     <div class="w3-panel w3-info w3-padding">
@@ -212,6 +217,8 @@
     box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.2);
     margin-bottom: 8px;
     border-radius: 5px;
+    z-index: 100;
+    background-color: white;
 }
 
 .grid-item--width2 { 

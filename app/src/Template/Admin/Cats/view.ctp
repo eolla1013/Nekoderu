@@ -60,4 +60,27 @@
         <h4><?= __('Address') ?></h4>
         <?= $this->Text->autoParagraph(h($cat->address)); ?>
     </div>
+    <div class="row">
+        <h4><?= __('Answers') ?></h4>
+        <table>
+        <?php foreach ($cat->answers as $answer): ?>
+            <tr>
+                <td><?=$answer->question->name ?></td>
+                <td><?=$answer->question->displayName ?></td>
+                <td><?=$answer->value ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </table>
+    </div>
+    <div class="row">
+        <h4><?= __('Notes') ?></h4>
+        <table>
+        <?php foreach ($cat->notes as $note): ?>
+            <tr>
+                <td><?=$note->name ?></td>
+                <td><?=$note->value ?></td>
+            </tr>
+        <?php endforeach; ?>
+        </table>
+    </div>
 </div>

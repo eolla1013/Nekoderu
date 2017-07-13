@@ -60,7 +60,6 @@ class CatsController extends AppController
             $order = null;
         }
         
-        
         $data = $this->CatsCommon->listCats(null, $order);
         $cats = $this->paginate($data);
         
@@ -104,7 +103,7 @@ class CatsController extends AppController
     {
         $this->CatImages = TableRegistry::get("CatImages");
         $images = $this->CatImages->find('all')
-            ->contain(['Cats'])
+            ->contain(['Cats', 'CatImageAnalyses'])
             ->where([
                 'Cats.hidden =' => 0
             ])
@@ -150,7 +149,7 @@ class CatsController extends AppController
         
         $cat = $this->Cats->get($id, [
             'contain' => [
-                'CatImages', 
+                'CatImages', 'CatImages.CatImageAnalyses',
                 'Comments'=> function ($q) {
                     return $q->order(['Comments.created' => 'DESC']);
                 },  
@@ -163,7 +162,6 @@ class CatsController extends AppController
                 'Eyewitnesses.EyewitnessImages'
             ]
         ]);
-        
         
         if($cat->hidden){
             return $this->redirect('/');
@@ -369,52 +367,6 @@ class CatsController extends AppController
             }else{
                 $limit = 20;
             }
-            
-           
-            
-            // $matchingComment = $this->Cats->Comments->find('all');
-            
-            // $matchingComment = $matchingComment
-            //     ->leftJoinWith('Reports')
-            //     ->select(['Comments.id', 'Comments.cats_id', 'Comments.created'])
-            //     ->select(['report_counts' => $matchingComment->func()->count('Reports.id')])
-            //     ->group('Comments.id')
-            //     ->having(['report_counts <' => 1])
-            //     ->where(['Comments.cats_id =' => $cats_id])
-            //     ->order(['Comments.created' => 'DESC'])
-            //     ->distinct()
-            //     ;
-            // debug($matchingComment->all()->toArray());
-            
-            // debug(array_column($matchingComment->all()->toArray(), 'id'));
-        
-            // $comments = $this->Cats->Comments->find()
-            //     ->where(['id' => $matchingComment]);
-            
-// $connection = \Cake\Datasource\ConnectionManager::get('default'); // DB接続を取得
-// $connection->logQueries(true); // SQL Queryのログ出力を有効化
-
-
-//             $comments = $this->Cats->Comments
-//                 ->find('all');
-//             $comments = $comments
-//                 ->leftJoinWith('Reports')
-//                 ->select($this->Cats->Comments)
-//                 ->select($this->Cats->Users)
-//                 // ->select($this->Cats->Reports)
-//                 ->select(['report_counts' => $comments->func()->count('Reports.id')])
-//                 ->contain(['Users', 'Reports'])
-//                 ->group('Comments.id')
-//                 ->having(['report_counts <' => 1])
-//                 ->where(['Comments.cats_id =' => $cats_id])
-//                 ->order(['Comments.created' => 'DESC'])
-//                 ->limit(20)
-//                 ->all();
-                
-// $connection->logQueries(false); // SQL Queryのログ出力を無効化
-                
-//                 debug($comments);
-//                 exit;
             
             $uid = $this->Auth->user('id');
             $comments = $this->Cats->Comments

@@ -2,6 +2,7 @@
 namespace App\Model\Table;
 
 use CakeDC\Users\Model\Table\UsersTable;
+use Cake\ORM\RulesChecker;
 
 /**
  * Users Model
@@ -31,6 +32,9 @@ class MyUsersTable extends UsersTable
         ]);
         $this->hasOne('Avatars', [
             'foreignKey' => 'users_id'
+        ]);
+        $this->hasMany('Similarities', [
+            'foreignKey' => 'user_id'
         ]);
     }
     

@@ -4,19 +4,31 @@ namespace App\Controller\Component;
 
 use Cake\Controller\Component;
 use Aws\S3\S3Client;
+use Cake\ORM\Table;
+use Cake\ORM\TableRegistry;
 
 define('APPLICATION_NAME', 'Drive API PHP Quickstart');
-define('CREDENTIALS_PATH', '~/.credentials/auth_token.json');
-define('REFRESH_TOKEN_PATH', '~/.credentials/refresh_token.json');
-
-/**
- * You need to get a credeintial file from Google Dev Console
- */
-define('CLIENT_SECRET_PATH', '~/.credentials/client_secret.json');
+define('CREDENTIAL_DIR', env("DATA_DIR").'.credentials/');
+define('AUTH_TOKEN_PATH', CREDENTIAL_DIR.'auth_token.json');
+define('REFRESH_TOKEN_PATH', CREDENTIAL_DIR.'refresh_token.json');
+define('TMP_DIR', env("DATA_DIR").'workspace/app/tmp/');
+define('CLIENT_SECRET_PATH', CREDENTIAL_DIR.'client_secret.json');
 
 class GoogleApiComponent extends Component {
    
-    public $components = array('NekoUtil');
+    public $components = ['NotificationManager', 'NekoUtil', 'CatsCommon'];
+    
+    public function initialize(array $config) {
+        if(!file_exists($this->NekoUtil->expandHomeDirectory(CREDENTIAL_DIR))){
+            mkdir($this->NekoUtil->expandHomeDirectory(CREDENTIAL_DIR), 0755, true);
+        }
+        if(!file_exists($this->NekoUtil->expandHomeDirectory(TMP_DIR))){
+            mkdir($this->NekoUtil->expandHomeDirectory(TMP_DIR), 0755, true);
+        }
+        // debug($this->NekoUtil->expandHomeDirectory(CREDENTIAL_DIR));
+        // debug($this->NekoUtil->expandHomeDirectory(TMP_DIR));
+        // exit;
+    }
    
      /**
      * Returns an authorized API client.
@@ -26,14 +38,15 @@ class GoogleApiComponent extends Component {
       
         $client = new \Google_Client();
         $client->setApplicationName(APPLICATION_NAME);
-        $client->setAuthConfig($this->expandHomeDirectory(CLIENT_SECRET_PATH));
+        $client->setAuthConfig($this->NekoUtil->expandHomeDirectory(CLIENT_SECRET_PATH));
         
         $client->addScope(\Google_Service_Drive::DRIVE_METADATA_READONLY);
         $client->addScope(\Google_Service_Drive::DRIVE_READONLY);
         $client->addScope(\Google_Service_Storage::DEVSTORAGE_FULL_CONTROL);
+        $client->addScope(\Google_Service_Sheets::SPREADSHEETS);
         
         if(isset($_SERVER['HTTP_HOST'])){
-            $client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/tests/oauth2callback');
+            $client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/admin/tests/oauth2callback');
         }
         $client->setApprovalPrompt("force");
         $client->setAccessType("offline");
@@ -43,23 +56,21 @@ class GoogleApiComponent extends Component {
         }
         
          // Load previously authorized credentials from a file.
-        $credentialsPath = $this->expandHomeDirectory($this->expandHomeDirectory(CREDENTIALS_PATH));
-        
-        // print_r($credentialsPath);
-        // exit;
+        $credentialsPath = $this->NekoUtil->expandHomeDirectory(AUTH_TOKEN_PATH);
         
         if (file_exists($credentialsPath)) {
             $accessToken = file_get_contents($credentialsPath);
         } else {
             // Request authorization from the user.
             $auth_url = $client->createAuthUrl();
+            // debug($auth_url);
             return $this->_registry->getController()->redirect(filter_var($auth_url, FILTER_SANITIZE_URL));
         }
         $client->setAccessToken($accessToken);
         
         // Refresh the token if it's expired.
         if ($client->isAccessTokenExpired()) {
-            $refreshTokenPath = $this->expandHomeDirectory($this->expandHomeDirectory(REFRESH_TOKEN_PATH));
+            $refreshTokenPath = $this->NekoUtil->expandHomeDirectory(REFRESH_TOKEN_PATH);
             $refreshToken = file_get_contents($refreshTokenPath);
             $client->refreshToken($refreshToken);
             file_put_contents($credentialsPath, $client->getAccessToken());
@@ -68,9 +79,16 @@ class GoogleApiComponent extends Component {
         return $client;
     }
     
+    
+    function connectGoogle($secret){
+        file_put_contents(CLIENT_SECRET_PATH, $secret);
+        $this->getClient();
+        return $this->_registry->getController()->redirect('/admin/functions');
+    }
+    
     function googleConnect(){
         $this->getClient();
-        return $this->_registry->getController()->redirect('/');
+        return $this->_registry->getController()->redirect('/admin/functions');
     }
     
     function googleRevoke(){
@@ -89,8 +107,8 @@ class GoogleApiComponent extends Component {
         // $google_token= json_decode($accessToken);
         // $refreshToken  = $google_token->refresh_token;
 
-        $credentialsPath = $this->expandHomeDirectory(CREDENTIALS_PATH);
-        $refreshTokenPath = $this->expandHomeDirectory(REFRESH_TOKEN_PATH);
+        $credentialsPath = $this->NekoUtil->expandHomeDirectory(AUTH_TOKEN_PATH);
+        $refreshTokenPath = $this->NekoUtil->expandHomeDirectory(REFRESH_TOKEN_PATH);
         // Store the credentials to disk.
         if(!file_exists(dirname($credentialsPath))) {
           mkdir(dirname($credentialsPath), 0700, true);
@@ -99,7 +117,7 @@ class GoogleApiComponent extends Component {
         file_put_contents($refreshTokenPath, $refreshToken);
         debug("Credentials saved to ". $credentialsPath);
         
-        return $this->_registry->getController()->redirect('/');
+        return $this->_registry->getController()->redirect('/admin/functions');
     }
     
     function detectObjects($image_path){
@@ -151,6 +169,139 @@ class GoogleApiComponent extends Component {
     	return $json;
     }
     
+    function num2alpha($n)
+    {
+        for($r = ""; $n >= 0; $n = intval($n / 26) - 1)
+            $r = chr($n%26 + 0x41) . $r;
+        return $r;
+    }
+    
+    function inputTNRDataFromGoogleDrive($spreadsheetId, $photoFolder, $maxnum_at_once = 1) {
+        
+        ob_implicit_flush(true);
+        
+        $this->Cats = TableRegistry::get('Cats');
+        $this->CatImages = TableRegistry::get('CatImages');
+        
+        $counter = 0;
+        
+        $data = $this->readDataFromTNRSpreadsheet($spreadsheetId);
+        foreach($data as $d){
+            if($counter >= $maxnum_at_once){
+                break;
+            }
+            
+            $d['number'] = sprintf('%04d', $d['number']);
+            $cuid = str_replace("/","_",$d['date'])."_".$d['number'];
+            $d['cuid'] = $cuid;
+            
+            $cat = $this->Cats->Notes->find('all')->where(['value' => $cuid])->first();
+            if($cat != null){
+                continue;
+            }
+            $counter++;
+            
+            debug($cuid);
+            $cat = $this->Cats->newEntity();
+            $cat->address = $d['address'];
+            $cat->flg = 10; //TNR記録
+            $cat->hidden = true;
+            
+            //ネコの保存
+            if($this->Cats->save($cat)){
+                
+                //タグの追加
+                $tags = [];
+                $tag = $this->CatsCommon->addTag("TNR");
+                $tags[] = $tag;
+                $this->Cats->Tags->link($cat, $tags);
+                if($this->Cats->save($cat, ['associated' => ['Tags']])){
+                }
+                
+                $this->Questions = TableRegistry::get('Questions');
+                $questions = $this->Questions->find('all');
+                foreach($questions as $question){
+                    if($question->name === "name"){
+                        $answer = $this->Cats->Answers->newEntity();
+                        $answer->cats_id = $cat->id;
+                        $answer->questions_id = $question->id;
+                        $answer->value = $cuid;
+                        if ($this->Cats->Answers->save($answer)) {
+                        }
+                    }
+                }
+                
+                //追加情報の保存
+                foreach($d as $key => $value){
+                    if(strlen($value) > 0){
+                        $note = $this->Cats->Notes->newEntity();
+                        $note->cat_id = $cat->id;
+                        $note->name = $key;
+                        $note->value = $value;
+                        if($this->Cats->Notes->save($note)){
+                            
+                        }
+                    }
+                }
+                
+                try {
+                        $this->Drive = null;
+                        unset($this->Drive);
+                        //写真の取得と保存
+                        $client = $this->getClient();
+                        $this->Drive = new \Google_Service_Drive($client);
+                        
+                    $parameters = [
+                        'q' => " '{$photoFolder}' in parents and name = '".$d['number'] ."'", 
+                        'fields' => 'files',
+                        'pageSize' => '1'];
+                    
+                    $list = $this->Drive->files->listFiles($parameters);
+                    if(count($list->getFiles())<=0){
+                        continue;
+                    }
+                    $folderId = $list->getFiles()[0]['id'];
+                    
+                    $parameters = [
+                        'q' => " '{$folderId}' in parents", 
+                        'fields' => 'files',
+                        'pageSize' => '100'];
+                    $photos = $this->Drive->files->listFiles($parameters);
+                    
+                    foreach($photos->getFiles() as $photo){
+                       $this->savePhoto($photo, $cat);
+                    }
+                }      
+                catch (Exception $e)
+                {
+                	print $e->getMessage();
+                	exit;
+                }
+            }
+        }
+        
+        debug("Done");
+    }
+    
+    function savePhoto($photo, $cat){
+                        
+        $content = $this->Drive->files->get($photo['id'], ['alt' => 'media']);
+        $path = $this->NekoUtil->expandHomeDirectory(TMP_DIR.$photo->getName());
+        
+        file_put_contents($path, $content->getBody());
+        
+        $result = $this->CatsCommon->saveCatImage($path, $cat->id);
+        @unlink($path);
+        
+        $path = null;
+        unset($path);
+        $result = null;
+        unset($result);
+        $content = null;
+        unset($content);
+        
+    }
+    
     
     function gcpUpload($file_path, $file_name, $gcp_bucket) {
         
@@ -182,145 +333,156 @@ class GoogleApiComponent extends Component {
         	print $e->getMessage();
         	exit;
         }
-    
         
-        // file_put_contents("gs://$gcp_bucket/".basename($file), $file);
-        // AIzaSyBoBnKV2kj2wPfsDuBnBtjj1RGT9po11ng
     }
-
-    // function s3Upload($file, $s3Dir) {
-    //     $ext = $this->extension($file);
-    //     $srcPath = $file;
-
-    //     $timestamp = uniqid();
-    //     $name = $timestamp . "_file." . $ext;
-        
-    //     $s3 = new S3Client([
-    //         'version'     => getenv('AWS_BUCKET_VERSION'),
-    //         'region'      => getenv('AWS_BUCKET_REGION'),
-    //         'credentials' => [
-    //             'key'    => getenv('AWS_BUCKET_KEY'),
-    //             'secret' => getenv('AWS_BUCKET_SECRET')
-    //         ]
-    //     ]);
-
-    //     try {
-    //         // Upload a file.
-    //         $result = $s3->putObject(array(
-    //             'Bucket'       => getenv('AWS_BUCKET_NAME'),
-    //             'Key'        => $name,
-    //             'SourceFile' => $srcPath,
-    //             'ACL'          => 'public-read',
-    //         ));
-
-    //         return $result;
-    //     }catch (\RuntimeException $e){
-    //         throw $e;
-    //     }
-
-    // }
     
-    // /**
-    //  * Expands the home directory alias '~' to the full path.
-    //  * @param string $path the path to expand.
-    //  * @return string the expanded path.
-    //  */
-    // function expandHomeDirectory($path) {
-    //   $homeDirectory = getenv('HOME');
-    //   if (empty($homeDirectory)) {
-    //     $homeDirectory = getenv("HOMEDRIVE") . getenv("HOMEPATH");
-    //   }
-    //   return str_replace('~', realpath($homeDirectory), $path);
-    // }
-   
-    // /**
-    //  * 一度画像を別の形式に変換し、jpg形式に変換する
-    //  * TODO: @utsumi-k PHP Parserを使うかは場合は別途用意する
-    //  * @param $orgFilePath
-    //  * @param $exportFilePath
-    //  *
-    //  * @return string
-    //  */
-    // function safeImage($orgFilePath, $exportFilePath) {
-    //     // 書き出しファイル名を生成
-    //     $outputFilePath = $exportFilePath . "/" . $this->generateUniqueFileName();
 
-    //     // 元画像情報を取得
-    //     $size = getimagesize($orgFilePath);
-    //     if ($size === false) {
-    //         // 画像として認識できなかった
-    //         return "";
-    //     }
-    //     list($w, $h, $type) = $size;
-    //     list($width, $height) = $this->getSaveFileSize($w, $h);
-
-    //     // 1回最初にリサイズする
-    //     $res = new \Imagick($orgFilePath);
-    //     if (!$res->thumbnailImage($width, $height, true, true)) {
-    //         // リサイズ失敗
-    //         return "";
-    //     }
-
-    //     if ($type == IMG_JPEG) {
-    //         // 一度pngにする
-    //         if (!$res->setImageFormat('png')) {
-    //             // 1回PNGに出来なかった
-    //             return "";
-    //         }
-    //     }
-    //     // 問題なかったのでjpgにしましょう。
-    //     if (!$res->setImageFormat("jpg")) {
-    //         // JPGへの変換失敗
-    //         return "";
-    //     }
-    //     if (!$res->writeImage($outputFilePath)) {
-    //         // 書き込み失敗
-    //         return "";
-    //     }
-
-    //     return $outputFilePath;
-    // }
-
-    // /**
-    //  * Uniqueなファイル名を生成する
-    //  * TODO: 絶対かぶらない保証もないし、非同期で保存されるけど、今んとこそこは危惧するレベルではないと判断
-    //  * @return string
-    //  */
-    // function generateUniqueFileName() {
-    //     return md5(uniqid(rand(),1)) . ".jpg";
-    // }
-
-
-    // /**
-    //  * 保存するサイズを計算する
-    //  * 960*540 までのサイズにする
-    //  * @param $orgWidth
-    //  * @param $orgHeight
-    //  *
-    //  * @return array
-    //  */
-    // function getSaveFileSize($orgWidth, $orgHeight) {
-    //     $maxWidth = 960;
-    //     $maxHeight = 540;
-    //     $w = $orgWidth;
-    //     $h = $orgHeight;
-
-    //     if ($orgWidth > $maxWidth || $orgHeight > $maxHeight) {
-    //         // リサイズ必要
-    //         if ($orgWidth > $orgHeight) {
-    //             // 横長
-    //             $rate = $maxWidth / $orgWidth;
-
-    //         } elseif ($orgHeight > $orgWidth) {
-    //             // 縦長
-    //             $rate = $maxHeight / $orgHeight;
-    //         } else {
-    //             // 正方形
-    //             $rate = $maxHeight / $orgHeight;
-    //         }
-    //         $w = (int)($orgWidth * $rate);
-    //         $h = (int)($orgHeight * $rate);
-    //     }
-    //     return [$w,$h];
-    // }
+    
+    function readDataFromTNRSpreadsheet($spreadsheetId) {
+        
+        $client = $this->getClient();
+        $this->Sheets = new \Google_Service_Sheets($client);
+        
+            
+        $spreadsheet = $this->Sheets->spreadsheets->get($spreadsheetId);
+        $sheets = $spreadsheet->getSheets();
+        
+        {
+            $sheet = $sheets[0]; //カゴタグ
+            $title = $sheet->getProperties()->title;
+            // debug($sheet->getProperties()->getGridProperties());
+            $columnCount = $sheet->getProperties()->getGridProperties()->columnCount;
+            $frozenRowCount = $sheet->getProperties()->getGridProperties()->frozenRowCount;
+            $rowCount = $sheet->getProperties()->getGridProperties()->rowCount;
+            
+            $range = $title.'!A'.'1'.':'.$this->num2alpha($columnCount).$rowCount;
+            $response = $this->Sheets->spreadsheets_values->get($spreadsheetId, $range);
+            $kagoTagValues = $response->getValues();
+        }
+        
+        {
+            $sheet = $sheets[1]; //ネコタグ
+            $title = $sheet->getProperties()->title;
+            // debug($sheet->getProperties()->getGridProperties());
+            $columnCount = $sheet->getProperties()->getGridProperties()->columnCount;
+            $frozenRowCount = $sheet->getProperties()->getGridProperties()->frozenRowCount;
+            $rowCount = $sheet->getProperties()->getGridProperties()->rowCount;
+            
+            $range = $title.'!A'.'1'.':'.$this->num2alpha($columnCount).$rowCount;
+            $response = $this->Sheets->spreadsheets_values->get($spreadsheetId, $range);
+            $nekoTagValues = $response->getValues();
+        }
+        
+        {
+            $sheet = $sheets[2]; //同意書
+            $title = $sheet->getProperties()->title;
+            // debug($sheet->getProperties()->getGridProperties());
+            $columnCount = $sheet->getProperties()->getGridProperties()->columnCount;
+            $frozenRowCount = $sheet->getProperties()->getGridProperties()->frozenRowCount;
+            $rowCount = $sheet->getProperties()->getGridProperties()->rowCount;
+            
+            $range = $title.'!A'.'1'.':'.$this->num2alpha($columnCount).$rowCount;
+            $response = $this->Sheets->spreadsheets_values->get($spreadsheetId, $range);
+            $doishoValues = $response->getValues();
+            
+            $doishoValues[0][0] = 'number';
+            
+           
+            for($i=2; $i<count($doishoValues); $i++){
+                if(count($doishoValues[$i])<=0){
+                    continue;
+                }
+                $nums = split(',', $doishoValues[$i][0]);
+                foreach($nums as $num){
+                    if(intval($num) > 0){
+                        $doishoList[intval($num)] = array_slice($doishoValues[$i], 1);
+                        array_splice($doishoList[intval($num)], 0, 0, intval($num));
+                    }
+                }
+            }
+        }
+        
+        //カゴタグ
+        $data = [];
+        for($i=2; $i<count($kagoTagValues); $i++){
+            $row = [];
+            
+            for($j=0; $j<count($kagoTagValues[0]); $j++){
+                if($j >= count($kagoTagValues[$i])){
+                    $row[$kagoTagValues[0][$j]] = "";
+                }else{
+                    $row[$kagoTagValues[0][$j]] = $kagoTagValues[$i][$j];
+                }
+            }
+            $data[$row['number']] = $row;
+        }
+        
+        //ネコタグ
+        for($i=2; $i<count($nekoTagValues); $i++){
+            $row = [];
+            
+            for($j=0; $j<count($nekoTagValues[0]); $j++){
+                if($j >= count($nekoTagValues[$i])){
+                    $row[$nekoTagValues[0][$j]] = "";
+                }else{
+                    $row[$nekoTagValues[0][$j]] = $nekoTagValues[$i][$j];
+                }
+            }
+            if(!array_key_exists($row['number'], $data)){
+                debug("ERROR:Missing Nekotag:".$row['number']);
+                $data[$row['number']] = [];
+                $data[$row['number']]['number'] = $row['number'];
+                $data[$row['number']]['remarks'] = "";
+            }
+            
+            $remarks = $data[$row['number']]['remarks'].",".$row['remarks'];
+            foreach ($row as $key => $value){
+                if(array_key_exists($key, $data[$row['number']])){
+                    if(strlen(trim($data[$row['number']][$key])) <= 0){
+                        $data[$row['number']][$key] = $value;    
+                    }
+                }else{
+                    $data[$row['number']][$key] = $value;
+                }
+            }
+            $data[$row['number']]['remarks'] = $remarks;
+        }
+    
+        //同意書
+        foreach($doishoList as $doisho) {
+            $row = [];
+            
+            for($j=0; $j<count($doishoValues[0]); $j++){
+                 if($j >= count($doisho)){
+                    $row[$doishoValues[0][$j]] = "";
+                }else{
+                    $row[$doishoValues[0][$j]] = $doisho[$j];
+                }
+            }
+            if(!array_key_exists($row['number'], $data)){
+                debug("ERROR:Missing Kagotag and Nekotag:".$row['number']);
+                $data[$row['number']] = [];
+                $data[$row['number']]['number'] = $row['number'];
+                $data[$row['number']]['remarks'] = "";
+            }
+            
+            $remarks = $data[$row['number']]['remarks'].",".$row['remarks'];
+            foreach ($row as $key => $value){
+                if(array_key_exists($key, $data[$row['number']])){
+                    if(strlen(trim($data[$row['number']][$key])) <= 0){
+                        $data[$row['number']][$key] = $value;    
+                    }
+                }else{
+                    $data[$row['number']][$key] = $value;
+                }
+            }
+            $data[$row['number']]['remarks'] = $remarks;
+            
+        }
+        
+        // debug($data);
+        // // debug(count($data));
+        // exit;
+        return $data;
+    }
 }

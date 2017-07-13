@@ -60,6 +60,9 @@ $(function(){
 <?php $this->end(); ?>
 <?= $this->fetch('content-head') ?>
 
+<?php $prefix = isset($this->request->params['prefix']) ? '/'.$this->request->params['prefix'] : ''; ?>
+
+
 <!-- The Modal -->
 <div id="modal-address" class="modal">
     <!-- Modal content -->
@@ -91,9 +94,9 @@ $(function(){
                             <div class="name"><?= $cat->answers[0]->value ?></div>
                         <?php endif; ?>
                     <?php if($image->thumbnail):?>
-                        <div><a title="<a class='more' href='/cats/view/<?=$cat->id ?>'>詳しく見る</a>" class='gallery' href="<?= $image->url ?>"><img src="<?= $image->thumbnail ?>" width="100%"></img></a></div>
+                        <div><a title="<a class='more' href='<?=$prefix?>/cats/view/<?=$cat->id ?>'>詳しく見る</a>" class='gallery' href="<?= $image->url ?>"><img src="<?= $image->thumbnail ?>" width="100%"></img></a></div>
                     <?php else: ?>
-                        <div><a title="<a class='more' href='/cats/view/<?=$cat->id ?>'>詳しく見る</a>" class='gallery' href="<?= $image->url ?>"><img src="<?= $image->url ?>" width="100%"></img></a></div>
+                        <div><a title="<a class='more' href='<?=$prefix?>/cats/view/<?=$cat->id ?>'>詳しく見る</a>" class='gallery' href="<?= $image->url ?>"><img src="<?= $image->url ?>" width="100%"></img></a></div>
                     <?php endif; ?>
                     </div>
                     <?php if(!empty($cat->user->username)): ?>
@@ -148,7 +151,7 @@ $(function(){
                                 <span class="count"> <?=count($cat->favorites) ?></span>
                             </a>
                         <?php endif; ?>
-                        <a href="/cats/view/<?=$cat->id ?>" role="button" class=" encourage-popup btn btn-default btn-sm">
+                        <a href="<?=$prefix?>/cats/view/<?=$cat->id ?>" role="button" class=" encourage-popup btn btn-default btn-sm">
                               <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                               <span class="count"><?=count($cat->comments) ?></span>
                         </a>

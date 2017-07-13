@@ -3,6 +3,8 @@
 namespace App\Shell;
 
 use Cake\Console\Shell;
+use Cake\Controller\ComponentRegistry;
+use App\Controller\Component\GoogleApiComponent;
 
 class CatShell extends Shell
 {
@@ -11,11 +13,47 @@ class CatShell extends Shell
     {
         parent::initialize();
         $this->loadModel('Cats');
+        $this->loadModel('CatImages');
+        $this->GoogleApi = new GoogleApiComponent(new ComponentRegistry());
     }
     
     public function main()
     {
         $this->out('Hello world.');
+    }
+    
+    
+    public function inputTNRDataFromGoogleDrive($sheetId, $folderId, $maxnum){
+        debug($sheetId);
+        debug($folderId);
+        debug(intval($maxnum));
+        $this->GoogleApi->inputTNRDataFromGoogleDrive(
+            $sheetId, $folderId, $maxnum
+        );
+    }
+    
+    public function setImageAnalysis(){
+     
+        $catImages = $this->CatImages->find()->contain(['CatImageAnalyses']);
+        
+        foreach($catImages as $catImage){
+            
+            if(count($catImage->cat_image_analyses) <= 0){
+                $json = $this->GoogleApi->detectObjects($catImage->url);
+                $cia = $this->CatImages->CatImageAnalyses->newEntity();
+                
+                $cia->catImage_id = $catImage->id;
+                $cia->analyzer = "vision.googleapis.com/v1/images:annotate";
+                $cia->data = $json;
+                if($this->CatImages->CatImageAnalyses->save($cia)){
+                    $catImage->catImageAnalyses = [$cia];
+                    
+                    $this->out($catImage->url);
+                    $this->out($json);
+                }
+            }
+        }
+        
     }
     
     public function setLocation()

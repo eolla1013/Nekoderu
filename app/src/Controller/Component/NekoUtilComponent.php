@@ -60,10 +60,11 @@ class NekoUtilComponent extends Component {
     }
     
     function s3Upload($file, $s3Dir) {
+        
         $ext = $this->extension($file);
         $srcPath = $file;
 
-        $timestamp = uniqid();
+        $timestamp = sha1( uniqid( mt_rand() , true ) );
         $name = $timestamp . "_file." . $ext;
         
         $s3 = new S3Client([
@@ -83,7 +84,10 @@ class NekoUtilComponent extends Component {
                 'SourceFile' => $srcPath,
                 'ACL'          => 'public-read',
             ));
-
+            
+            $s3 = null;
+            unset($s3);
+            
             return $result;
         }catch (\RuntimeException $e){
             throw $e;
@@ -101,7 +105,13 @@ class NekoUtilComponent extends Component {
       if (empty($homeDirectory)) {
         $homeDirectory = getenv("HOMEDRIVE") . getenv("HOMEPATH");
       }
-      return str_replace('~', realpath($homeDirectory), $path);
+      $path = str_replace('~', realpath($homeDirectory), $path);
+      
+      if(substr($path,  0, strlen("/")) === "/"){
+        return $path;
+      }else{
+          return WWW_ROOT.$path;
+      }
     }
     
     /**

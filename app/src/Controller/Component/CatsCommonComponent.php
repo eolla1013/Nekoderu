@@ -4,6 +4,8 @@ namespace App\Controller\Component;
 use Cake\Controller\Component;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
+use Cake\Routing\Router;
+use Cake\Log\Log;
 
 class CatsCommonComponent extends Component {
     
@@ -14,6 +16,7 @@ class CatsCommonComponent extends Component {
     public function initialize(array $config) {
         $this->Controller = $this->_registry->getController();
     }
+    
     
     public function add($flg = 0, $appendTag = null){
         $this->Controller->CatImages = TableRegistry::get('CatImages');
@@ -107,25 +110,29 @@ class CatsCommonComponent extends Component {
     }
     
     public function saveImageOnAWS($file, $cat_id, $uid, $thumbnailing = true) {
+        $this->Cats = TableRegistry::get('Cats');
         
         $result = $this->NekoUtil->s3Upload($file, '');
-        // 書きだした画像を削除
-        @unlink($savePath);
         
         if($thumbnailing){
             //サムネイルを作成
             $savePath = $this->NekoUtil->createThumbnail($file, TMP);
             if ($savePath === "") {
-                die("不正な画像がuploadされました");
+                Log::error("不正な画像がuploadされました");
+                // die("不正な画像がuploadされました");
+                return;
             }
             $thumbnail = $this->NekoUtil->s3Upload($savePath, '');
             // 書きだした画像を削除
             @unlink($savePath);
         }
-
+        
+        // 書きだした画像を削除
+        @unlink($file);
+        
         if ($result) {
             
-            $catImage = $this->Controller->Cats->CatImages->newEntity();
+            $catImage = $this->Cats->CatImages->newEntity();
             $catImage->url = $result['ObjectURL'];
             if($thumbnailing){
                 $catImage->thumbnail = $thumbnail['ObjectURL'];
@@ -134,32 +141,36 @@ class CatsCommonComponent extends Component {
             }
             $catImage->users_id = $uid;
             $catImage->cats_id = $cat_id;
-            if ($this->Controller->Cats->CatImages->save($catImage)) {
-                // $this->Flash->success('画像を保存しました。');
+            if ($this->Cats->CatImages->save($catImage)) {
                 return $catImage;
             }
         }
+        
     }
     
-    public function saveCatMovie($file, $cat_id, $uid, $thumbnailing = true){
+    public function saveCatMovie($file, $cat_id, $uid=null, $thumbnailing = true){
         return $this->saveImageOnAWS($file, $cat_id, $uid, false);
     }
     
-    public function saveCatImage($file, $cat_id, $uid, $thumbnailing = true){
+    public function saveCatImage($file, $cat_id, $uid=null, $thumbnailing = true){
         
         $savePath = $this->NekoUtil->safeImage($file, TMP);
         if ($savePath === "") {
-            die("不正な画像がuploadされました");
+            Log::error("不正な動画がuploadされました");
+            // die("不正な画像がuploadされました");
         }
+        
         return $this->saveImageOnAWS($savePath, $cat_id, $uid, true);
     }
     
-    private function addTag($value){
-        $tag = $this->Controller->Cats->Tags->find('all')->where(['tag =' => $value])->first();
+    public function addTag($value){
+        $this->Cats = TableRegistry::get('Cats');
+        
+        $tag = $this->Cats->Tags->find('all')->where(['tag =' => $value])->first();
         if($tag == null){
-            $tag = $this->Controller->Cats->Tags->newEntity($tag);
+            $tag = $this->Cats->Tags->newEntity($tag);
             $tag->tag = $value;
-            if($this->Controller->Cats->Tags->save($tag)){
+            if($this->Cats->Tags->save($tag)){
             }
         }
         return $tag;
@@ -260,7 +271,7 @@ class CatsCommonComponent extends Component {
         }
     }
     
-    public function listCats($users_id = null, $order = null){
+    public function listCats($users_id = null, $order = null, $show_hidden = false){
         $this->Cats = TableRegistry::get('Cats');
         
         // $this->Cookie->write("Order.Preference", $order);
@@ -290,11 +301,13 @@ class CatsCommonComponent extends Component {
                                 'Questions.name =' => 'name'
                             ])
                             ->contain(['Questions']);
-                }])
-                ->where([
-                    'Cats.hidden =' => 0
-                ])
-                ->group('Cats.id')
+                }]);
+                if(!$show_hidden){
+                    $query->where([
+                        'Cats.hidden =' => 0
+                    ]);
+                }
+                $query->group('Cats.id')
                 ->order(['count' => 'DESC'])
                 ;
                 
@@ -324,11 +337,13 @@ class CatsCommonComponent extends Component {
                             'Questions.name =' => 'name'
                         ])
                         ->contain(['Questions']);
-                }])
-                ->where([
-                    'Cats.hidden =' => 0
-                ])
-                ->group('Cats.id')
+                }]);
+                if(!$show_hidden){
+                    $query->where([
+                        'Cats.hidden =' => 0
+                    ]);
+                }
+                $query->group('Cats.id')
                 ->order(['last' => 'DESC'])
                 ;
                 
@@ -352,10 +367,13 @@ class CatsCommonComponent extends Component {
                             'Questions.name =' => 'name'
                         ])
                         ->contain(['Questions']);
-                }])
-                ->where([
-                    'Cats.hidden =' => 0
-                ])
+                }]);
+                if(!$show_hidden){
+                    $query->where([
+                        'Cats.hidden =' => 0
+                    ]);
+                }
+                $query->group('Cats.id')
                 ->order(['Cats.created' => 'DESC']);
                 
         }

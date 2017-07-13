@@ -8,9 +8,78 @@
         <div class="map-rapper">
             <div id="map" class="map"></div>
         </div>
-    
     </div>
 </div>
+<?php 
+
+    // debug($cats);
+    $json_cats = json_encode($cats); 
+    
+?>
+
+<script>
+    function initMap() {
+        // Create a map object and specify the DOM element for display.
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 32.806186, lng: 130.705834},
+          scrollwheel: false,
+          zoom: 10
+        });
+        
+        var json_cats = <?=$json_cats?>;
+        
+        for(var i in json_cats){
+            var cat = json_cats[i];
+            (function(){
+                var locs = cat.locate.split(",");
+                
+                var latLng = {lat: Number.parseFloat(locs[0]), lng: Number.parseFloat(locs[1])};
+                console.log(cat);
+                var marker = new google.maps.Marker({
+                    position: latLng,
+                    map: map,
+                    // title: 'Hello World!'
+                });
+                var content = "";
+                if(cat.cat_images.length > 0){
+                    content +="<div style='text-align:left;'>"
+                    if(cat.cat_images[0].thumbnail.length > 0){
+                        content += "<img src='"+cat.cat_images[0].thumbnail+"' width='200px'>"
+                    }else{
+                        content += "<img src='"+cat.cat_images[0].url+"' width='200px'>"
+                    }
+                    
+                    if(cat.cat_images[0].cat_image_analyses.length > 0){
+                        var data = JSON.parse(cat.cat_images[0].cat_image_analyses[0].data);
+                        var labels = data.responses[0].labelAnnotations;
+                        // console.log(labels);
+                        content += "<h6>画像解析結果</h6>";
+                        content += "<div><ul>";
+                        for(var ii in labels){
+                            var label = labels[ii];
+                            content += "<li>"+label.description+" ("+label.score+")</li>";
+                        }
+                        content += "</ul></div>";
+                    }
+                    content +="</div>"
+                    
+                    var infowindow = new google.maps.InfoWindow({
+                        content: content
+                    });
+                    
+                    marker.addListener('click', function() {
+                        infowindow.open(map, marker);
+                    });
+                }
+                
+            })(cat);
+        }
+        
+        // var myLatLng = {lat: -25.363, lng: 131.044};
+
+       
+    }
+</script>
 
 <!-- maps window template -->
 <script type="x-tmpl-mustache" id="template-info-window">
@@ -40,5 +109,5 @@
 <link rel="stylesheet" href="/css/map.css">
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 <script src="<?php echo$this->Url->build('/', false); ?>js/jquery.ui.touch-punch.min.js"></script>
-<script type="text/javascript" src="<?php echo$this->Url->build('/', false); ?>js/index.js"></script>
+<!--<script type="text/javascript" src="<?php echo$this->Url->build('/', false); ?>js/index.js"></script>-->
 <script async defer src="//maps.googleapis.com/maps/api/js?key=AIzaSyAb1SFRkz9TtARWL_sPqw6D3oHCgbpLLcw&callback=initMap"></script>

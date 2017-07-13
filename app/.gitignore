@@ -5,3 +5,7 @@
 
 .env
 /bower_components
+
+.credentials
+
+webroot/tmp
